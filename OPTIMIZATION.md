@@ -13,7 +13,7 @@ To decrease the runtime, instead of using `np.random.multivariate_normal`, sampl
 
 ##### 1.1.3 Code Comparison
 
-\`\`\`python
+```
 def sample_normal(
     Sigma: np.ndarray,
     n: int,
@@ -42,7 +42,7 @@ def sample_normal_fast(
     Z = rng.normal(size=(n, p))
 
     return mu[None, :] + Z @ L.T
-\`\`\`
+```
 
 ##### 1.1.4 Performance Impact
 
