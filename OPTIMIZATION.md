@@ -20,10 +20,6 @@ def sample_normal(
     mu: Optional[np.ndarray] = None,
     seed: Optional[int] = 725
 ) -> np.ndarray:
-    """
-    Draw X ~ N(mu, Sigma), shape (n, p).
-    If mu is None, uses zero mean (0_p).
-    """
     p = Sigma.shape[0]
     if mu is None:
         mu = np.zeros(p)
@@ -36,11 +32,6 @@ def sample_normal_fast(
     mu: Optional[np.ndarray] = None,
     seed: Optional[int] = 725
 ) -> np.ndarray:
-    """
-    Draw X ~ N(mu, Sigma), shape (n, p) fast using Cholesky decomposition.
-    If mu is None, uses zero mean (0_p).
-    """
-
     p = Sigma.shape[0]
     if mu is None:
         mu = np.zeros(p)
