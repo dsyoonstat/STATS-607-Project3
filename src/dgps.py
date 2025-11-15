@@ -83,6 +83,30 @@ def sample_normal(
     rng = np.random.default_rng(seed)
     return rng.multivariate_normal(mu, Sigma, size=n)
 
+def sample_normal_fast(
+    Sigma: np.ndarray,
+    n: int,
+    mu: Optional[np.ndarray] = None,
+    seed: Optional[int] = 725
+) -> np.ndarray:
+    """
+    Draw X ~ N(mu, Sigma), shape (n, p) fast using Cholesky decomposition.
+    If mu is None, uses zero mean (0_p).
+    """
+
+    p = Sigma.shape[0]
+    if mu is None:
+        mu = np.zeros(p)
+    rng = np.random.default_rng(seed)
+
+    # Cholesky
+    L = cholesky(Sigma)
+    Z = rng.normal(size=(n, p))
+
+    return mu[None, :] + Z @ L.T
+
+
+
 
 def sample_t(
     Sigma: np.ndarray,

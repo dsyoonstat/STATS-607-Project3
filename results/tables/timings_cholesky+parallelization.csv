@@ -1,0 +1,4 @@
+task,seconds
+run_simulation_single,2.74
+run_simulation_multi,2.66
+run_simulation_convergence_rate,4.17

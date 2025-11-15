@@ -1,0 +1,116 @@
+single: p sweep:   0%|                                                                                                                     | 0/5 [00:00<?, ?it/s/Users/dsyoon/STATS 607/Project3/src/dgps.py:84: RuntimeWarning: divide by zero encountered in matmul                                     | 0/100 [00:00<?, ?it/s]
+  return rng.multivariate_normal(mu, Sigma, size=n)
+/Users/dsyoon/STATS 607/Project3/src/dgps.py:84: RuntimeWarning: overflow encountered in matmul
+  return rng.multivariate_normal(mu, Sigma, size=n)
+/Users/dsyoon/STATS 607/Project3/src/dgps.py:84: RuntimeWarning: invalid value encountered in matmul
+  return rng.multivariate_normal(mu, Sigma, size=n)
+/Users/dsyoon/STATS 607/Project3/src/dgps.py:134: RuntimeWarning: divide by zero encountered in matmul
+  T = (Z @ L.T) / np.sqrt(w / nu)[:, None]  # each row scaled by sqrt(nu/w)
+/Users/dsyoon/STATS 607/Project3/src/dgps.py:134: RuntimeWarning: overflow encountered in matmul
+  T = (Z @ L.T) / np.sqrt(w / nu)[:, None]  # each row scaled by sqrt(nu/w)
+/Users/dsyoon/STATS 607/Project3/src/dgps.py:134: RuntimeWarning: invalid value encountered in matmul
+  T = (Z @ L.T) / np.sqrt(w / nu)[:, None]  # each row scaled by sqrt(nu/w)
+                                                                                                                                                                /Users/dsyoon/STATS 607/Project3/src/methods.py:144: RuntimeWarning: divide by zero encountered in matmul                                 | 0/100 [00:00<?, ?it/s]
+  G = (Xc @ Xc.T) / float(n)              # (n, n), SPSD
+/Users/dsyoon/STATS 607/Project3/src/methods.py:144: RuntimeWarning: overflow encountered in matmul
+  G = (Xc @ Xc.T) / float(n)              # (n, n), SPSD
+/Users/dsyoon/STATS 607/Project3/src/methods.py:144: RuntimeWarning: invalid value encountered in matmul
+  G = (Xc @ Xc.T) / float(n)              # (n, n), SPSD
+/Users/dsyoon/STATS 607/Project3/src/methods.py:157: RuntimeWarning: divide by zero encountered in matmul
+  U_m = (Xc.T @ Qm) / denom[None, :]      # (p, spike_number)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:157: RuntimeWarning: overflow encountered in matmul
+  U_m = (Xc.T @ Qm) / denom[None, :]      # (p, spike_number)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:157: RuntimeWarning: invalid value encountered in matmul
+  U_m = (Xc.T @ Qm) / denom[None, :]      # (p, spike_number)
+                                                                                                                                                                /Users/dsyoon/STATS 607/Project3/src/methods.py:48: RuntimeWarning: divide by zero encountered in matmul                                    | 0/5 [00:00<?, ?it/s]
+  G = (Xc @ Xc.T) / float(n)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:48: RuntimeWarning: overflow encountered in matmul
+  G = (Xc @ Xc.T) / float(n)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:48: RuntimeWarning: invalid value encountered in matmul
+  G = (Xc @ Xc.T) / float(n)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:64: RuntimeWarning: divide by zero encountered in matmul
+  U_spike = (Xc.T @ Q_spike) / denom[None, :]               # (p, spike_number)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:64: RuntimeWarning: overflow encountered in matmul
+  U_spike = (Xc.T @ Q_spike) / denom[None, :]               # (p, spike_number)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:64: RuntimeWarning: invalid value encountered in matmul
+  U_spike = (Xc.T @ Q_spike) / denom[None, :]               # (p, spike_number)
+single: p sweep:  40%|███████████████████████████████████████████▌                                                                 | 2/5 [00:00<00:00,  3.01it/s/Users/dsyoon/STATS 607/Project3/src/dgps.py:148: RuntimeWarning: divide by zero encountered in matmul                                      | 0/5 [00:00<?, ?it/s]
+  return E @ A.T
+/Users/dsyoon/STATS 607/Project3/src/dgps.py:148: RuntimeWarning: overflow encountered in matmul
+  return E @ A.T
+/Users/dsyoon/STATS 607/Project3/src/dgps.py:148: RuntimeWarning: invalid value encountered in matmul
+  return E @ A.T
+single: p sweep:  60%|█████████████████████████████████████████████████████████████████▍                                           | 3/5 [00:02<00:01,  1.17it/s/Users/dsyoon/STATS 607/Project3/src/metrics.py:13: RuntimeWarning: divide by zero encountered in matmul                                  | 0/100 [00:00<?, ?it/s]
+  S = np.linalg.svd(U.T @ V, full_matrices=False, compute_uv=False)
+/Users/dsyoon/STATS 607/Project3/src/metrics.py:13: RuntimeWarning: overflow encountered in matmul
+  S = np.linalg.svd(U.T @ V, full_matrices=False, compute_uv=False)
+/Users/dsyoon/STATS 607/Project3/src/metrics.py:13: RuntimeWarning: invalid value encountered in matmul
+  S = np.linalg.svd(U.T @ V, full_matrices=False, compute_uv=False)
+                                                                                                                                                                /Users/dsyoon/STATS 607/Project3/src/methods.py:74: RuntimeWarning: divide by zero encountered in matmul                                    | 0/5 [00:00<?, ?it/s]
+  Gv  = reference_vectors.T @ reference_vectors          # (r, r)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:74: RuntimeWarning: overflow encountered in matmul
+  Gv  = reference_vectors.T @ reference_vectors          # (r, r)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:74: RuntimeWarning: invalid value encountered in matmul
+  Gv  = reference_vectors.T @ reference_vectors          # (r, r)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:75: RuntimeWarning: divide by zero encountered in matmul
+  VtU = reference_vectors.T @ U_spike                    # (r, spike_number)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:75: RuntimeWarning: overflow encountered in matmul
+  VtU = reference_vectors.T @ U_spike                    # (r, spike_number)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:75: RuntimeWarning: invalid value encountered in matmul
+  VtU = reference_vectors.T @ U_spike                    # (r, spike_number)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:81: RuntimeWarning: divide by zero encountered in matmul
+  UtM   = U_spike.T @ M                                   # (spike_number, spike_number)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:81: RuntimeWarning: overflow encountered in matmul
+  UtM   = U_spike.T @ M                                   # (spike_number, spike_number)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:81: RuntimeWarning: invalid value encountered in matmul
+  UtM   = U_spike.T @ M                                   # (spike_number, spike_number)
+🕒 Wrote step timings to results/tables/single_step_timings.csv                                                                                                  
+✅ Single simulation complete. Saved in results/tables                                                                                                           
+⏱️ run_simulation_single took 46.28 s
+multi: p sweep:  80%|████████████████████████████████████████████████████████████████████████████████████████                      | 4/5 [00:07<00:02,  2.56s/it/Users/dsyoon/STATS 607/Project3/src/methods.py:77: RuntimeWarning: divide by zero encountered in matmul                                  | 0/100 [00:00<?, ?it/s]
+  M   = U_spike - reference_vectors @ Y                  # (p, spike_number)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:77: RuntimeWarning: overflow encountered in matmul
+  M   = U_spike - reference_vectors @ Y                  # (p, spike_number)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:77: RuntimeWarning: invalid value encountered in matmul
+  M   = U_spike - reference_vectors @ Y                  # (p, spike_number)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:82: RuntimeWarning: divide by zero encountered in matmul
+  S_m_M = U_spike @ (lam_spike[:, None] * UtM)            # (p, spike_number)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:82: RuntimeWarning: overflow encountered in matmul
+  S_m_M = U_spike @ (lam_spike[:, None] * UtM)            # (p, spike_number)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:82: RuntimeWarning: invalid value encountered in matmul
+  S_m_M = U_spike @ (lam_spike[:, None] * UtM)            # (p, spike_number)
+🕒 Wrote step timings to results/tables/multi_step_timings.csv                                                                                                   
+✅ Multi simulation complete. Saved in results/tables                                                                                                            
+⏱️ run_simulation_multi took 46.05 s
+convergence: SNR sweep:   0%|                                                                                                              | 0/6 [00:00<?, ?it/s/Users/dsyoon/STATS 607/Project3/src/methods.py:222: RuntimeWarning: divide by zero encountered in matmul                                   | 0/5 [00:00<?, ?it/s]
+  G = (Xc @ Xc.T) / float(n)              # (n, n)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:222: RuntimeWarning: overflow encountered in matmul
+  G = (Xc @ Xc.T) / float(n)              # (n, n)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:222: RuntimeWarning: invalid value encountered in matmul
+  G = (Xc @ Xc.T) / float(n)              # (n, n)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:236: RuntimeWarning: divide by zero encountered in matmul
+  U = (Xc.T @ Qm) / denom[None, :]        # (p, m)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:236: RuntimeWarning: overflow encountered in matmul
+  U = (Xc.T @ Qm) / denom[None, :]        # (p, m)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:236: RuntimeWarning: invalid value encountered in matmul
+  U = (Xc.T @ Qm) / denom[None, :]        # (p, m)
+                                                                                                                                                                /Users/dsyoon/STATS 607/Project3/src/methods.py:243: RuntimeWarning: divide by zero encountered in matmul                           | 3/5 [00:01<00:01,  1.72it/s]
+  a = U.T @ V                              # (m, r)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:243: RuntimeWarning: overflow encountered in matmul
+  a = U.T @ V                              # (m, r)
+/Users/dsyoon/STATS 607/Project3/src/methods.py:243: RuntimeWarning: invalid value encountered in matmul
+  a = U.T @ V                              # (m, r)
+/Users/dsyoon/STATS 607/Project3/src/simulation.py:639: RuntimeWarning: divide by zero encountered in matmul
+  ip = float(np.abs(u1[:, 0].T @ d1))  # |u1^T d1|
+/Users/dsyoon/STATS 607/Project3/src/simulation.py:639: RuntimeWarning: overflow encountered in matmul
+  ip = float(np.abs(u1[:, 0].T @ d1))  # |u1^T d1|
+/Users/dsyoon/STATS 607/Project3/src/simulation.py:639: RuntimeWarning: invalid value encountered in matmul
+  ip = float(np.abs(u1[:, 0].T @ d1))  # |u1^T d1|
+🕒 Wrote step timings to results/tables/convergence_step_timings.csv                                                                                             
+✅ Convergence-rate simulation complete. Saved in results/tables                                                                                                 
+⏱️ run_simulation_convergence_rate took 277.41 s
+🕒 Wrote total simulation timings to results/tables/timings.csv
+                              task  seconds
+0            run_simulation_single    46.28
+1             run_simulation_multi    46.05
+2  run_simulation_convergence_rate   277.41
