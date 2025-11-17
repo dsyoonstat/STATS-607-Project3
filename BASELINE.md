@@ -1,4 +1,4 @@
-# 1. Total runtime of entire simulation study
+# 1. Total Runtime of Entire Simulation Study
 
 | **Task**                        | **Seconds** |
 | ------------------------------- | ----------- |
@@ -6,11 +6,12 @@
 | run_simulation_multi            | 46.18       |
 | run_simulation_convergence_rate | 272.47      |
 | **Total**                       | **366.69**  |
+
 # 2. Runtime of each simulation
 
 ### 2.1 run_simulation_single
 
-##### 2.1.1 Multivariate normal case
+##### 2.1.1 Multivariate Normal Case
 
 | **p**    | **Data generation (s)** | **Estimator computation (s)** | **Metric computation (s)** |
 | -------- | ----------------------- | ----------------------------- | -------------------------- |
@@ -19,7 +20,8 @@
 | **500**  | 1.23                    | 0.102                         | 0.00576                    |
 | **1000** | 5.41                    | 0.114                         | 0.00823                    |
 | **2000** | 38.4                    | 0.127                         | 0.00618                    |
-##### 2.1.2 Multivariate t case
+
+##### 2.1.2 Multivariate t Case
 
 | **p**    | **Data generation (s)** | **Estimator computation (s)** | **Metric computation (s)** |
 | -------- | ----------------------- | ----------------------------- | -------------------------- |
@@ -31,7 +33,7 @@
 
 ### 2.2 run_simulation_multi
 
-##### 2.2.1 Multivariate normal case
+##### 2.2.1 Multivariate Normal Case
 
 | **p**    | **Data generation (s)** | **Estimator computation (s)** | **Metric computation (s)** |
 | -------- | ----------------------- | ----------------------------- | -------------------------- |
@@ -40,7 +42,7 @@
 | **500**  | 1.14                    | 0.0398                        | 0.00222                    |
 | **1000** | 5.12                    | 0.0499                        | 0.00342                    |
 | **2000** | 37.7                    | 0.0687                        | 0.00407                    |
-##### 2.2.2 Multivariate t case
+##### 2.2.2 Multivariate t Case
 
 | **p**    | **Data generation (s)** | **Estimator computation (s)** | **Metric computation (s)** |
 | -------- | ----------------------- | ----------------------------- | -------------------------- |
@@ -61,15 +63,15 @@ This simulation only considers multivariate normal case.
 | **1000** | 31.1                    | 0.152                         | 0.00558                    |
 | **2000** | 232                     | 0.199                         | 0.00648                    |
 
-# 3. Bottleneck analysis
+# 3. Bottleneck Analysis
 
 It is apparent that the main bottleneck is the data generation for multivariate normal distribution when the dimension $p$ is large. Note that data generation for multivariate t distribution is relatively fast. This is due to the fact that data generation for multivariate normal distribution used `np.random.multivariate_normal`, while that for multivariate t distribution used Cholesky decomposition of covariance matrix $\Sigma$. While doing **Unit 2 Project**, I did not notice that there is a huge difference in speed. Therefore, by adopting Cholesky decomposition to generate multivariate normal data will give a huge boost in speed, although the data generation procedure still remains most time-consuming among data generation, estimator computation and metric computation.
 
-# 4. Computational complexity analysis
+# 4. Computational Complexity Analysis
 
 Since High-Dimensional Low-Sample Size(HDLSS) asymptotics fix the sample size $n$ and let the dimension $p$ grows to $\infty$, we consider the computational complexity with respect to the $p$. 
 
-### 4.1 Empirical analysis
+### 4.1 Empirical Analysis
 
 The estimated computational complexity using log-log regression is as follows:
 
@@ -84,9 +86,9 @@ The estimated computational complexity using log-log regression is as follows:
 
 The high $R^2$ values across all three steps strongly suggest that the empirical computational complexity estimates are highly reliable. It's worthy to note that $R^2$ for data generation is remarkably close to 1.0 (averaging 0.9935). This near-perfect fit occurs because the data generation step is dominated by a single, high-complexity operation—$\mathrm{O}(p^3)$ Singular Value Decomposition or Cholesky Decomposition—which serves as a clean, overriding bottleneck.
 
-### 4.2 Theoretical analysis
+### 4.2 Theoretical Analysis
 
-##### 4.2.1 Data generation
+##### 4.2.1 Data Generation
 
 Since both Singular Value Decomposition used in `np.random.multivariate_normal` and Cholesky Decomposition has same computational complexity of $O(p^3)$, the theoretical computational complexity of data generation step is $O(p^3)$ as analyzed below.
 
@@ -97,7 +99,7 @@ Since both Singular Value Decomposition used in `np.random.multivariate_normal` 
 | **Transformation**                | $\mathrm{O}(p^2)$          |
 | **Overall**                       | $\mathbf{\mathrm{O}(p^3)}$ |
 
-##### 4.2.2 Estimator computation
+##### 4.2.2 Estimator Computation
 
 The theoretical computational complexity of estimator computation step is $O(p)$ thanks to Gram matrix trick which was adopted during **Unit 2 Project** to reduce runtime, as analyzed below.
 
@@ -107,7 +109,8 @@ The theoretical computational complexity of estimator computation step is $O(p)$
 | **Eigenvector Recovery**    | $\mathrm{O}(p)$          |
 | **Transformation**          | $\mathrm{O}(p)$          |
 | **Overall**                 | $\mathbf{\mathrm{O}(p)}$ |
-##### 4.2.3 Metric computation
+
+##### 4.2.3 Metric Computation
 
 The theoretical computational complexity of metric computation step is $O(p)$ as analyzed below.
 

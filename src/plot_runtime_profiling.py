@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-# plot_runtime_profiling.py
-# - Single-spike, single-reference runtime breakdown
-# - Multi-spike, multi-reference runtime breakdown
-# - Convergence-rate simulation runtime breakdown
-#   Buckets: Data generation / Estimator computation / Evaluation
+# plot_runtime_profiling_variants.py
 
 from pathlib import Path
 import numpy as np
@@ -12,9 +8,24 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 
+# ---------------------- configuration ----------------------
+
+# variant_key: 파일명에 그대로 사용됨
+VARIANTS = {
+    "baseline": {
+        "pretty": "Baseline",
+    },
+    "cholesky": {
+        "pretty": "Cholesky",
+    },
+    "cholesky+parallelization": {
+        "pretty": "Cholesky + Parallelization",
+    },
+}
+
+
 # ---------------------- aesthetics ----------------------
 def _set_pub_style():
-    """Set matplotlib parameters for a clean, publication-quality style."""
     mpl.rcParams.update({
         "figure.dpi": 150,
         "savefig.dpi": 300,
@@ -37,14 +48,12 @@ def _set_pub_style():
 
 
 def _ensure_dirs():
-    """Ensure expected folders exist."""
     base = Path("results")
     (base / "tables").mkdir(exist_ok=True, parents=True)
     (base / "figures").mkdir(exist_ok=True, parents=True)
 
 
-def _save(fig: mpl.figure.Figure, stem: str):
-    """Save figure as PDF and SVG into results/figures."""
+def _save(fig, stem: str):
     out_pdf = Path("results/figures") / f"{stem}.pdf"
     out_svg = Path("results/figures") / f"{stem}.svg"
     fig.savefig(out_pdf)
@@ -53,20 +62,7 @@ def _save(fig: mpl.figure.Figure, stem: str):
 
 
 # ---------------------- generic aggregation helper ----------------------
-def _aggregate_buckets(df: pd.DataFrame,
-                       mask_data,
-                       mask_sub,
-                       mask_ang) -> pd.DataFrame:
-    """
-    Aggregate into three buckets for each p:
-
-        data_gen            = sum seconds_total over mask_data
-        computing_estimator = sum seconds_total over mask_sub
-        principal_angles    = sum seconds_total over mask_ang
-
-    Returns DataFrame with columns:
-        p, data_gen, computing_estimator, principal_angles
-    """
+def _aggregate_buckets(df, mask_data, mask_sub, mask_ang):
     g1 = (
         df.loc[mask_data]
           .groupby("p", as_index=False)["seconds_total"]
@@ -97,37 +93,45 @@ def _aggregate_buckets(df: pd.DataFrame,
     return merged
 
 
-# ---------------------- single: build tables ----------------------
-def _load_single_step_timings() -> pd.DataFrame:
-    """Load single_step_timings.csv from results/tables."""
-    csv_path = Path("results/tables/single_step_timings.csv")
+# ---------------------- loading helpers ----------------------
+def _load_step_timings(kind: str, variant_key: str):
+    csv_path = Path("results/tables") / f"{kind}_step_timings_{variant_key}.csv"
     if not csv_path.exists():
         raise FileNotFoundError(f"Cannot find {csv_path}")
     df = pd.read_csv(csv_path)
+
     required = {"p", "step", "seconds_total"}
     missing = required - set(df.columns)
     if missing:
-        raise ValueError(f"CSV missing required columns in single_step_timings: {missing}")
+        raise ValueError(f"CSV missing required columns: {missing}")
+
     return df
 
 
-def _build_single_runtime_tables() -> None:
-    """
-    From single_step_timings.csv, build and save:
+def _load_convergence_step_timings(variant_key: str):
+    csv_path = Path("results/tables") / f"convergence_step_timings_{variant_key}.csv"
+    if not csv_path.exists():
+        raise FileNotFoundError(f"Cannot find {csv_path}")
+    df = pd.read_csv(csv_path)
 
-      results/tables/single_normal_timings.csv
-      results/tables/single_t_timings.csv
-    """
-    df = _load_single_step_timings()
+    required = {"p", "step", "seconds_total"}
+    missing = required - set(df.columns)
+    if missing:
+        raise ValueError(f"CSV missing required columns: {missing}")
 
-    # Normal masks (single)
+    return df
+
+
+# ---------------------- single simulation ----------------------
+def _build_single_runtime_tables(variant_key: str):
+    df = _load_step_timings("single", variant_key)
+
     is_data_gen_normal = df["step"].str.startswith("data_gen_normal")
     is_arg_normal_sub  = df["step"].str.startswith("ARG_normal_compute_ARG_PC_subspace")
     is_base_normal_sub = df["step"].str.startswith("baseline_normal_compute_PC_subspace")
     is_arg_normal_ang  = df["step"].str.startswith("ARG_normal_compute_principal_angles")
     is_base_normal_ang = df["step"].str.startswith("baseline_normal_compute_principal_angles")
 
-    # t masks (single)
     is_data_gen_t      = df["step"].str.startswith("data_gen_t")
     is_arg_t_sub       = df["step"].str.startswith("ARG_t_compute_ARG_PC_subspace")
     is_base_t_sub      = df["step"].str.startswith("baseline_t_compute_PC_subspace")
@@ -148,45 +152,21 @@ def _build_single_runtime_tables() -> None:
         mask_ang=is_arg_t_ang | is_base_t_ang,
     )
 
-    tables_dir = Path("results/tables")
-    normal_path = tables_dir / "single_normal_timings.csv"
-    t_path      = tables_dir / "single_t_timings.csv"
-    normal.to_csv(normal_path, index=False)
-    tdf.to_csv(t_path, index=False)
-    print(f"Saved single runtime tables:\n  {normal_path}\n  {t_path}")
+    base = Path("results/tables")
+    normal.to_csv(base / f"single_normal_timings_{variant_key}.csv", index=False)
+    tdf.to_csv(base / f"single_t_timings_{variant_key}.csv", index=False)
 
 
-# ---------------------- multi: build tables ----------------------
-def _load_multi_step_timings() -> pd.DataFrame:
-    """Load multi_step_timings.csv from results/tables."""
-    csv_path = Path("results/tables/multi_step_timings.csv")
-    if not csv_path.exists():
-        raise FileNotFoundError(f"Cannot find {csv_path}")
-    df = pd.read_csv(csv_path)
-    required = {"p", "step", "seconds_total"}
-    missing = required - set(df.columns)
-    if missing:
-        raise ValueError(f"CSV missing required columns in multi_step_timings: {missing}")
-    return df
+# ---------------------- multi simulation ----------------------
+def _build_multi_runtime_tables(variant_key: str):
+    df = _load_step_timings("multi", variant_key)
 
-
-def _build_multi_runtime_tables() -> None:
-    """
-    From multi_step_timings.csv, build and save:
-
-      results/tables/multi_normal_timings.csv
-      results/tables/multi_t_timings.csv
-    """
-    df = _load_multi_step_timings()
-
-    # Normal masks (multi)
     is_data_gen_normal = df["step"].str.startswith("data_gen_normal")
     is_arg_normal_sub  = df["step"].str.startswith("ARG_normal_compute_ARG_PC_subspace")
     is_pca_normal_sub  = df["step"].str.startswith("PCA_normal_compute_PC_subspace")
     is_arg_normal_ang  = df["step"].str.startswith("ARG_normal_compute_principal_angles")
     is_pca_normal_ang  = df["step"].str.startswith("PCA_normal_compute_principal_angles")
 
-    # t masks (multi)
     is_data_gen_t      = df["step"].str.startswith("data_gen_t")
     is_arg_t_sub       = df["step"].str.startswith("ARG_t_compute_ARG_PC_subspace")
     is_pca_t_sub       = df["step"].str.startswith("PCA_t_compute_PC_subspace")
@@ -207,97 +187,44 @@ def _build_multi_runtime_tables() -> None:
         mask_ang=is_arg_t_ang | is_pca_t_ang,
     )
 
-    tables_dir = Path("results/tables")
-    normal_path = tables_dir / "multi_normal_timings.csv"
-    t_path      = tables_dir / "multi_t_timings.csv"
-    normal.to_csv(normal_path, index=False)
-    tdf.to_csv(t_path, index=False)
-    print(f"Saved multi runtime tables:\n  {normal_path}\n  {t_path}")
+    base = Path("results/tables")
+    normal.to_csv(base / f"multi_normal_timings_{variant_key}.csv", index=False)
+    tdf.to_csv(base / f"multi_t_timings_{variant_key}.csv", index=False)
 
 
-# ---------------------- convergence: build table ----------------------
-def _load_convergence_step_timings() -> pd.DataFrame:
-    """Load convergence_step_timings.csv from results/tables."""
-    csv_path = Path("results/tables/convergence_step_timings.csv")
-    if not csv_path.exists():
-        raise FileNotFoundError(f"Cannot find {csv_path}")
-    df = pd.read_csv(csv_path)
-    required = {"p", "step", "seconds_total"}
-    missing = required - set(df.columns)
-    if missing:
-        raise ValueError(f"CSV missing required columns in convergence_step_timings: {missing}")
-    return df
+# ---------------------- convergence simulation ----------------------
+def _build_convergence_runtime_table(variant_key: str):
+    df = _load_convergence_step_timings(variant_key)
 
-
-def _build_convergence_runtime_table() -> None:
-    """
-    From convergence_step_timings.csv, build and save:
-
-      results/tables/convergence_timings.csv
-
-    Buckets:
-      Data generation     : steps starting with 'data_gen'
-      Compute discriminant: steps containing 'compute_discriminant'
-      Evaluation          : steps starting with 'alpha_accumulate' or 'inner_product'
-
-    All SNRs are summed: group only by p.
-    """
-    df = _load_convergence_step_timings()
-
-    # Data generation
     is_data_gen = df["step"].str.startswith("data_gen")
+    is_disc     = df["step"].str.contains("compute_discriminant")
+    is_alpha    = df["step"].str.startswith("alpha_accumulate")
+    is_ip       = df["step"].str.startswith("inner_product")
 
-    # Compute discriminant
-    is_disc = df["step"].str.contains("compute_discriminant", regex=False)
+    conv = _aggregate_buckets(df,
+                              mask_data=is_data_gen,
+                              mask_sub=is_disc,
+                              mask_ang=is_alpha | is_ip)
 
-    # Evaluation: alpha_accumulate + inner_product
-    is_alpha = df["step"].str.startswith("alpha_accumulate")
-    is_ip    = df["step"].str.startswith("inner_product")
-    is_eval  = is_alpha | is_ip
-
-    conv = _aggregate_buckets(
-        df,
-        mask_data=is_data_gen,
-        mask_sub=is_disc,
-        mask_ang=is_eval,
-    )
-
-    tables_dir = Path("results/tables")
-    out_path = tables_dir / "convergence_timings.csv"
-    conv.to_csv(out_path, index=False)
-    print(f"Saved convergence runtime table:\n  {out_path}")
+    Path("results/tables") \
+        .joinpath(f"convergence_timings_{variant_key}.csv") \
+        .write_text(conv.to_csv(index=False))
 
 
 # ---------------------- plotting ----------------------
-def _load_runtime_table(stem: str) -> pd.DataFrame:
-    """
-    Load aggregated runtime table from results/tables/{stem}.csv
-    stem ∈ {
-      "single_normal_timings", "single_t_timings",
-      "multi_normal_timings", "multi_t_timings",
-      "convergence_timings"
-    }
-    """
-    path = Path("results/tables") / f"{stem}.csv"
+def _load_runtime_table(stem: str, variant_key: str):
+    path = Path("results/tables") / f"{stem}_{variant_key}.csv"
     if not path.exists():
-        raise FileNotFoundError(f"Cannot find {path}. "
-                                f"Run aggregation step first.")
-    df = pd.read_csv(path)
-    return df
+        raise FileNotFoundError(f"Cannot find {path}")
+    return pd.read_csv(path)
 
 
-def _plot_three_buckets(df: pd.DataFrame, title: str, stem: str):
-    """
-    Grouped bar chart:
-      x-axis: p
-      bars  : [Data generation, Estimator computation, Evaluation]
-    """
+def _plot_three_buckets(df, title: str, stem: str):
     labels = ["Data generation", "Estimator computation", "Evaluation"]
     keys   = ["data_gen", "computing_estimator", "principal_angles"]
 
     x = np.arange(len(df["p"]))
     width = 0.26
-
     fig, ax = plt.subplots(figsize=(6.2, 3.9))
 
     for idx, key in enumerate(keys):
@@ -319,55 +246,22 @@ def _plot_three_buckets(df: pd.DataFrame, title: str, stem: str):
     plt.close(fig)
 
 
-def _plot_from_tables():
-    """
-    Read aggregated runtime tables from results/tables and plot:
+def _plot_variant(variant_key: str, pretty: str):
+    stems = [
+        ("single_normal_timings", "Single simulation runtime breakdown (Normal)"),
+        ("single_t_timings",      "Single simulation runtime breakdown (Student-t)"),
+        ("multi_normal_timings",  "Multi simulation runtime breakdown (Normal)"),
+        ("multi_t_timings",       "Multi simulation runtime breakdown (Student-t)"),
+        ("convergence_timings",   "Convergence simulation runtime breakdown (all SNRs)"),
+    ]
 
-      single_normal_timings.(pdf|svg)
-      single_t_timings.(pdf|svg)
-      multi_normal_timings.(pdf|svg)
-      multi_t_timings.(pdf|svg)
-      convergence_timings.(pdf|svg)
-    """
-    # Single
-    single_normal = _load_runtime_table("single_normal_timings")
-    single_t      = _load_runtime_table("single_t_timings")
-
-    _plot_three_buckets(
-        single_normal,
-        "Single simulation runtime breakdown (Normal)",
-        "single_normal_timings",
-    )
-
-    _plot_three_buckets(
-        single_t,
-        "Single simulation runtime breakdown (Student-t)",
-        "single_t_timings",
-    )
-
-    # Multi
-    multi_normal = _load_runtime_table("multi_normal_timings")
-    multi_t      = _load_runtime_table("multi_t_timings")
-
-    _plot_three_buckets(
-        multi_normal,
-        "Multi simulation runtime breakdown (Normal)",
-        "multi_normal_timings",
-    )
-
-    _plot_three_buckets(
-        multi_t,
-        "Multi simulation runtime breakdown (Student-t)",
-        "multi_t_timings",
-    )
-
-    # Convergence (all SNRs aggregated)
-    conv = _load_runtime_table("convergence_timings")
-    _plot_three_buckets(
-        conv,
-        "Convergence simulation runtime breakdown (all SNRs)",
-        "convergence_timings",
-    )
+    for stem, title in stems:
+        df = _load_runtime_table(stem, variant_key)
+        _plot_three_buckets(
+            df,
+            f"{title} – {pretty}",
+            f"{stem}_{variant_key}"
+        )
 
 
 # ---------------------- main ----------------------
@@ -375,17 +269,14 @@ def main():
     _ensure_dirs()
     _set_pub_style()
 
-    # 1) single_step_timings.csv → single_normal/t_timings.csv (tables/)
-    _build_single_runtime_tables()
+    for variant_key, info in VARIANTS.items():
+        pretty = info["pretty"]
+        print(f"\n=== Processing: {variant_key} ===")
 
-    # 2) multi_step_timings.csv → multi_normal/t_timings.csv (tables/)
-    _build_multi_runtime_tables()
-
-    # 3) convergence_step_timings.csv → convergence_timings.csv (tables/)
-    _build_convergence_runtime_table()
-
-    # 4) read those tables and make figures (figures/)
-    _plot_from_tables()
+        _build_single_runtime_tables(variant_key)
+        _build_multi_runtime_tables(variant_key)
+        _build_convergence_runtime_table(variant_key)
+        _plot_variant(variant_key, pretty)
 
 
 if __name__ == "__main__":

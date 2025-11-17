@@ -1,3 +1,11 @@
+# 0. Runtime Results
+
+| **Task**                        | **Baseline** | **Cholesky** | **Cholesky + Parallelization** |
+| ------------------------------- | ------------ | -------- | -------------------------- |
+| run_simulation_single           | 49.76        | 4.03     | 2.74                       |
+| run_simulation_multi            | 45.67        | 3.24     | 2.66                       |
+| run_simulation_convergence_rate | 273.24       | 8.98     | 4.17                       |
+| **Total**                       | **368.67**   | **16.25**    | **9.57**                       |
 
 # 1. Implemented Optimization Strategies
 
@@ -5,7 +13,7 @@
 
 ##### 1.1.1 Problem Identified
 
-The major bottleneck of baseline was multivariate normal data generation using `sample_normal`, which implements `np.random.multivariate_normal` using Singular Value Decomposition internally. 
+The major bottleneck of baseline was multivariate normal data generation using `sample_normal`, which implements `np.random.multivariate_normal` using Singular Value Decomposition internally.
 
 ##### 1.1.2 Solution Implemented
 
@@ -24,6 +32,7 @@ def sample_normal(
     if mu is None:
         mu = np.zeros(p)
     rng = np.random.default_rng(seed)
+
     return rng.multivariate_normal(mu, Sigma, size=n)
 
 def sample_normal_fast(
@@ -56,7 +65,7 @@ Generally, Cholesky Decomposition has some trade-offs. If the covariance matrix 
 
 ##### 1.2.1 Problem Identified
 
-The simulations are trivially parallelizable, since for `run_simulation_single` and `run_simulation_multi`, 100 repetitions are independent with each other. For `run_simulation_convergence_rate`, aside from repetitions, simulations for different signal-to-noise (SNR) values are also independent. Therefore, parallelization might give an extra boost.
+The simulations are embarrassingly parallelizable, since for `run_simulation_single` and `run_simulation_multi`, 100 repetitions are independent with each other. For `run_simulation_convergence_rate`, aside from repetitions, simulations for different signal-to-noise (SNR) values are also independent. Therefore, parallelization might give an extra boost.
 
 ##### 1.2.2 Solution Implemented
 
@@ -64,18 +73,20 @@ For the first two simulations `run_simulation_single` and `run_simulation_multi`
 
 ##### 1.2.3 Code Comparison
 
+Parallelization was implemented. Please refer to `simulation_cholesky+parallelization.py`.
 
+##### 1.2.4 Performance Impact
 
+The performance gain of implementing parallelization was not that significant as expected. There was a 40% reduction in runtime for the whole simulation pipeline, although the number of cores used were 10, 10, 6.
+
+##### 1.2.5 Trade-Offs
+
+In terms of the simulation result itself, there was no trade-off. However, from a computational perspective, increases in memory consumption, coding difficulty and profiling difficulty are clear cons of parallelization.
 
 
 # 2. Profiling Evidence
 
-| **Task**                        | **Baseline** | **Cholesky** | **Cholesky + Parallelization** |
-| ------------------------------- | ------------ | -------- | -------------------------- |
-| run_simulation_single           | 49.76        | 4.03     | 2.74                       |
-| run_simulation_multi            | 45.67        | 3.24     | 2.66                       |
-| run_simulation_convergence_rate | 273.24       | 8.98     | 4.17                       |
-| **Total**                       | **368.67**   | **16.25**    | **9.57**                       |
+
 
 # 3. Lessons Learned
 
