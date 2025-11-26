@@ -1,11 +1,14 @@
 # 0. Runtime Results
 
 | **Task**                        | **Baseline** | **Cholesky** | **Cholesky + Parallelization** |
-| ------------------------------- | ------------ | -------- | -------------------------- |
-| run_simulation_single           | 49.76        | 4.03     | 2.74                       |
-| run_simulation_multi            | 45.67        | 3.24     | 2.66                       |
-| run_simulation_convergence_rate | 273.24       | 8.98     | 4.17                       |
-| **Total**                       | **368.67**   | **16.25**    | **9.57**                       |
+| ------------------------------- | ------------ | ------------ | ------------------------------ |
+| run_simulation_single           | 46.99        | 4.22         | 2.77                           |
+| run_simulation_multi            | 47.40        | 3.45         | 2.70                           |
+| run_simulation_convergence_rate | 275.60       | 9.19         | 4.08                           |
+| **Total**                       | **369.99**   | **16.86**    | **9.55**                       |
+
+Note that runtime changes for each run. Also, this runtime excludes runtime for plotting.
+
 
 # 1. Implemented Optimization Strategies
 
@@ -69,7 +72,7 @@ The simulations are embarrassingly parallelizable, since for `run_simulation_sin
 
 ### 1.2.2 Solution Implemented
 
-For the first two simulations `run_simulation_single` and `run_simulation_multi`, 10 cores were used, so that each core can do 10 repetitions. For `run_simulation_convergen_rate`, 6 cores were used, since there are 6 SNR values.
+My computer has 14 cores. For the first two simulations `run_simulation_single` and `run_simulation_multi`, 10 cores were used, so that each core can do 10 repetitions. For `run_simulation_convergen_rate`, 6 cores were used, since there are 6 SNR values.
 
 ### 1.2.3 Code Comparison
 
@@ -84,7 +87,22 @@ The performance gain of implementing parallelization was not that significant as
 In terms of the simulation result itself, there was no trade-off. However, from a computational perspective, increases in memory consumption, coding difficulty and profiling difficulty are clear cons of parallelization.
 
 
-# 2. Profiling Evidence
+# 2. Runtime Analysis
+
+## 2.1 File Explanation
+
+All runtime results are saved under `timings/tables` with relevant figures in `timings/figures`.
+ - `(single/multi/convergence)_step_timings_(baseline/cholesky/cholesky+parallelization).csv`: initial profiling results
+ - `timings_(baseline/cholesky/cholesky+parallelization).csv`: total runtime
+ - `(single_normal/single_t/multi_normal/multi_t/convergence)_profiling_(baseline/cholesky/cholesky+parallelization).csv`: aggregated stepwise(data generation, estimator computation, metric computation) profiling results
+ - `complexity.csv`: estimated complexity exponents using log-log regression.
+
+## 2.2 
+
+
+Since most of the computational resource was focused on the data generation step, we give plots on the ratio of runtime of data generation to runtime of the other two steps for three simulations. 
+
+
 
 
 
@@ -101,3 +119,7 @@ We confirmed that for simulation studies involving relatively small or moderate 
 ## 3.3 Limitations of Parallelization Efficiency
 
 The performance gains achieved through parallelization were less dramatic than initially anticipated across all simulation settings. Although the number of cores was optimized, the runtime was reduced by only approximately $30\%$ for the first two simulations and $50\%$ for the final simulation. Given the **relatively small number of trials (100 times)**, the **auxiliary time expenditure**—including the launching, managing, and synchronizing parallel processes, along with the overhead from potential repeated tasks and the final result integration—was a limiting factor on overall efficiency.
+
+# 4. Consistency of the Result
+
+To verify that the simulation results obtained under the optimization strategies remain consistent with the original implementation, we performed regression-based comparison tests in `tests/test_regression.py`. For each CSV file generated under `results/tables`, all numerical entries were compared with their corresponding baseline values. Consistency was assessed using two criteria: the mean-squared error (MSE) had to remain below 5%, and the maximum relative deviation was allowed up to 25%. If either threshold was exceeded, the test was marked as a failure. All CSV files passed these checks, confirming that the use of Cholesky decomposition and parallelization preserves the statistical correctness of the simulation outputs.

@@ -2,9 +2,14 @@
 # - Single-spike, single-reference case: trend over a^2
 # - Multi-spike, multi-reference case: ARG/PCA × θ1/θ2
 # - Convergence: normalized p^α |u1ᵀ d1| curves
+#
+# For each method in {baseline, cholesky, cholesky+parallelization}:
+#   Tables:  results/tables/<method>/*.csv
+#   Figures: results/figures/<method>/*.pdf / .svg
 
 from pathlib import Path
 import re
+import glob
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
@@ -35,20 +40,25 @@ def _set_pub_style():
     })
 
 
-def _ensure_dirs():
-    """Ensure expected folders exist."""
+def _ensure_dirs(methods):
+    """Ensure expected folders exist for all methods."""
     base = Path("results")
     (base / "tables").mkdir(exist_ok=True, parents=True)
     (base / "figures").mkdir(exist_ok=True, parents=True)
+    for method in methods:
+        (base / "tables" / method).mkdir(exist_ok=True, parents=True)
+        (base / "figures" / method).mkdir(exist_ok=True, parents=True)
 
 
-def _save(fig: mpl.figure.Figure, stem: str):
-    """Save figure as PDF and SVG into results/figures."""
-    out_pdf = Path("results/figures") / f"{stem}.pdf"
-    out_svg = Path("results/figures") / f"{stem}.svg"
+def _save(fig: mpl.figure.Figure, stem: str, method: str):
+    """Save figure as PDF and SVG into results/figures/<method>."""
+    fig_dir = Path("results/figures") / method
+    fig_dir.mkdir(exist_ok=True, parents=True)
+    out_pdf = fig_dir / f"{stem}.pdf"
+    out_svg = fig_dir / f"{stem}.svg"
     fig.savefig(out_pdf)
     fig.savefig(out_svg)
-    print(f"Saved: {out_pdf}\n       {out_svg}")
+    print(f"[{method}] Saved: {out_pdf}\n           {out_svg}")
 
 
 # ---------------------- helpers ----------------------
@@ -73,21 +83,24 @@ def _parse_a2_columns(df: pd.DataFrame):
 
 
 # ---------------------- single: normal / t ----------------------
-def make_single_plots(dist: str):
+def make_single_plots(dist: str, method: str):
     """
     dist ∈ {'normal','t'}
+    method ∈ {'baseline','cholesky','cholesky+parallelization'}
+
     Inputs:
-      results/tables/single_{dist}_mean.csv
-      results/tables/single_{dist}_std.csv   (read but not used in the current figure)
+      results/tables/<method>/single_{dist}_mean.csv
+      results/tables/<method>/single_{dist}_std.csv   (read but not used in the current figure)
     Output:
-      results/figures/single_{dist}_trend.(pdf|svg)
+      results/figures/<method>/single_{dist}_trend.(pdf|svg)
     """
     from matplotlib.lines import Line2D
 
-    mean_path = Path(f"results/tables/single_{dist}_mean.csv")
-    std_path  = Path(f"results/tables/single_{dist}_std.csv")
+    tables_dir = Path("results/tables") / method
+    mean_path = tables_dir / f"single_{dist}_mean.csv"
+    std_path  = tables_dir / f"single_{dist}_std.csv"
     if not (mean_path.exists() and std_path.exists()):
-        raise FileNotFoundError(f"Missing single-{dist} tables: {mean_path}, {std_path}")
+        raise FileNotFoundError(f"[{method}] Missing single-{dist} tables: {mean_path}, {std_path}")
 
     df_mean = pd.read_csv(mean_path, index_col=0)
     _ = pd.read_csv(std_path,  index_col=0)  # kept for completeness; not plotted
@@ -112,7 +125,7 @@ def make_single_plots(dist: str):
 
     ax.set_xlabel(r"$a^2$")
     ax.set_ylabel("Mean angle (radians)")
-    ax.set_title(f"Single-spike, single-reference ({dist}) — trend over $a^2$")
+    ax.set_title(f"[{method}] Single-spike, single-reference ({dist}) — trend over $a^2$")
     ax.set_xlim(x_min, x_max)
     ax.set_ylim(bottom=0)
 
@@ -127,19 +140,22 @@ def make_single_plots(dist: str):
     labels.append("PCA baseline")
     ax.legend(handles=handles, labels=labels, ncol=2, loc="lower left", frameon=False)
 
-    _save(fig, f"single_{dist}_trend")
+    _save(fig, f"single_{dist}_trend", method)
     plt.close(fig)
 
 
 # ---------------------- multi: normal / t ----------------------
-def make_multi_plots(dist: str):
+def make_multi_plots(dist: str, method: str):
     """
     dist ∈ {'normal','t'}
+    method ∈ {'baseline','cholesky','cholesky+parallelization'}
+
     Inputs:
-      results/tables/multi_{dist}_mean.csv
-      results/tables/multi_{dist}_std.csv
+      results/tables/<method>/multi_{dist}_mean.csv
+      results/tables/<method>/multi_{dist}_std.csv
     Output:
-      results/figures/multi_{dist}_angles.(pdf|svg)
+      results/figures/<method>/multi_{dist}_angles.(pdf|svg)
+
     Spec:
       - One figure combining θ1/θ2 across methods:
           * colors: θ1 = first, θ2 = second
@@ -149,10 +165,11 @@ def make_multi_plots(dist: str):
     from matplotlib.ticker import FixedLocator, ScalarFormatter, NullLocator
     from matplotlib.lines import Line2D
 
-    mean_path = Path(f"results/tables/multi_{dist}_mean.csv")
-    std_path  = Path(f"results/tables/multi_{dist}_std.csv")
+    tables_dir = Path("results/tables") / method
+    mean_path = tables_dir / f"multi_{dist}_mean.csv"
+    std_path  = tables_dir / f"multi_{dist}_std.csv"
     if not (mean_path.exists() and std_path.exists()):
-        raise FileNotFoundError(f"Missing multi-{dist} tables: {mean_path}, {std_path}")
+        raise FileNotFoundError(f"[{method}] Missing multi-{dist} tables: {mean_path}, {std_path}")
 
     df_mean = pd.read_csv(mean_path, index_col=0)
     _ = pd.read_csv(std_path, index_col=0)
@@ -169,7 +186,8 @@ def make_multi_plots(dist: str):
 
     # Colors: θ1 = first, θ2 = second
     default_colors = mpl.rcParams["axes.prop_cycle"].by_key().get("color", ["#1f77b4", "#ff7f0e"])
-    c_th1, c_th2 = default_colors[0], default_colors[1] if len(default_colors) > 1 else "#ff7f0e"
+    c_th1 = default_colors[0]
+    c_th2 = default_colors[1] if len(default_colors) > 1 else "#ff7f0e"
 
     fig, ax = plt.subplots(figsize=(6.8, 4.0))
 
@@ -193,7 +211,7 @@ def make_multi_plots(dist: str):
 
     ax.set_xlabel(r"Dimension $p$ (log scale)")
     ax.set_ylabel(r"Mean principal angle (radians)")
-    ax.set_title(f"Two-spike, two-reference ({dist}) — θ₁ / θ₂ across methods")
+    ax.set_title(f"[{method}] Two-spike, two-reference ({dist}) — θ₁ / θ₂ across methods")
     ax.set_ylim(bottom=0)
 
     # Custom legend grouped by theta and method
@@ -211,20 +229,22 @@ def make_multi_plots(dist: str):
               handletextpad=0.8,
               columnspacing=1.8)
 
-    _save(fig, f"multi_{dist}_angles")
+    _save(fig, f"multi_{dist}_angles", method)
     plt.close(fig)
 
 
 # ---------------------- convergence (Theorem 4) ----------------------
-def make_convergence_plots():
+def make_convergence_plots(method: str):
     """
+    method ∈ {'baseline','cholesky','cholesky+parallelization'}
+
     Inputs:
-      results/tables/convergence_rate_snr*.csv
+      results/tables/<method>/convergence_rate_snr*.csv
         - rows: p in {100, 200, 500, 1000, 2000}
         - cols: alpha={value} (normalized by p=100)
 
     Output:
-      results/figures/convergence_rate_all.pdf / .svg
+      results/figures/<method>/convergence_rate.(pdf|svg)
 
     Spec:
       - One figure with multiple subplots (2×3 grid)
@@ -233,32 +253,29 @@ def make_convergence_plots():
       - 'o' markers; one color per alpha.
     """
     from matplotlib.ticker import FixedLocator, ScalarFormatter, NullLocator
-    import glob
-    import re
 
-    tables_dir = Path("results/tables")
-    plot_dir   = Path("results/figures")
-    plot_dir.mkdir(parents=True, exist_ok=True)
-
+    tables_dir = Path("results/tables") / method
     paths = sorted(glob.glob(str(tables_dir / "convergence_rate_snr*.csv")))
     if not paths:
-        raise FileNotFoundError(f"No convergence_rate_snr*.csv found in {tables_dir}")
+        raise FileNotFoundError(f"[{method}] No convergence_rate_snr*.csv found in {tables_dir}")
 
     snr_re = re.compile(r"convergence_rate_snr([0-9\.eE+-]+)\.csv$")
     p_ticks = [100, 200, 500, 1000, 2000]
 
-    # --- figure layout: 2×3 grid (adjust if different number of SNRs) ---
+    # figure layout: 2×3 grid (adjust if different number of SNRs)
     n_files = len(paths)
     n_rows, n_cols = 2, 3
     fig, axes = plt.subplots(n_rows, n_cols, figsize=(12, 7))
     axes = axes.flatten()
 
+    last_ax_idx = -1
     for i, path in enumerate(paths):
         if i >= len(axes):
             break  # in case more than 6 SNRs
         ax = axes[i]
+        last_ax_idx = i
 
-        m = snr_re.search(path)
+        m = snr_re.search(Path(path).name)
         snr_tag = m.group(1) if m else "?"
 
         df_norm = pd.read_csv(path, index_col=0)
@@ -267,7 +284,8 @@ def make_convergence_plots():
         # Plot each α curve
         for col in df_norm.columns:
             y = df_norm[col].to_numpy(float)
-            ax.plot(p_vals, y, marker="o", markersize = 4, linewidth=1.2, label=col.replace("alpha=", r"$\alpha$="))
+            label = col.replace("alpha=", r"$\alpha$=")
+            ax.plot(p_vals, y, marker="o", markersize=4, linewidth=1.2, label=label)
 
         # Log x-axis
         ax.set_xscale("log", base=10)
@@ -289,34 +307,41 @@ def make_convergence_plots():
             ax.set_ylabel(r"Normalized $p^{\alpha}|u_1^\top d_1|$")
 
     # Remove unused subplots (if any)
-    for j in range(i + 1, len(axes)):
+    for j in range(last_ax_idx + 1, len(axes)):
         fig.delaxes(axes[j])
 
     # Shared legend below all subplots
-    handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", ncol=10, frameon=False, fontsize=9)
-    fig.suptitle(r"Convergence-rate behavior across SNR values", fontsize=13)
+    # Use first populated axis for legend handles
+    first_ax = axes[0]
+    handles, labels = first_ax.get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=min(10, len(labels)), frameon=False, fontsize=9)
+    fig.suptitle(f"[{method}] Convergence-rate behavior across SNR values", fontsize=13)
     fig.tight_layout(rect=[0, 0.05, 1, 0.97])
 
-    _save(fig, "convergence_rate")
+    _save(fig, "convergence_rate", method)
     plt.close(fig)
 
 
 # ---------------------- main ----------------------
 def main():
-    _ensure_dirs()
+    methods = ("baseline", "cholesky", "cholesky+parallelization")
+
     _set_pub_style()
+    _ensure_dirs(methods)
 
-    # Single (normal / t)
-    for dist in ("normal", "t"):
-        make_single_plots(dist)
+    for method in methods:
+        print(f"\n=== Plotting for method: {method} ===")
+        # Single (normal / t)
+        for dist in ("normal", "t"):
+            make_single_plots(dist, method)
 
-    # Multi (normal / t)
-    for dist in ("normal", "t"):
-        make_multi_plots(dist)
+        # Multi (normal / t)
+        for dist in ("normal", "t"):
+            make_multi_plots(dist, method)
 
-    # Convergence (Theorem 4)
-    make_convergence_plots()
+        # Convergence (Theorem 4)
+        make_convergence_plots(method)
+
 
 if __name__ == "__main__":
     main()

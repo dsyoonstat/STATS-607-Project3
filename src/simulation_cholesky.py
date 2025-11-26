@@ -4,7 +4,8 @@
 # - Convergence-rate study for Theorem 4 (Normal)
 #
 # Outputs:
-#   results/tables/*.csv (summary tables)
+#   results/tables/cholesky/*.csv   (summary tables)
+#   timings/tables/*.csv            (runtime profiling)
 
 from typing import List, Tuple
 from pathlib import Path
@@ -21,7 +22,6 @@ from dgps import (
     generate_reference_vectors,
     sigma_single_spike,
     sigma_multi_spike,
-    sample_normal,
     sample_normal_fast,
     sample_t,
 )
@@ -75,9 +75,11 @@ def run_simulation_single(
     master_seed: int = 725,
 ) -> None:
     # --- paths ---
-    base_dir = Path("results")
-    tables_dir = base_dir / "tables"
-    tables_dir.mkdir(exist_ok=True, parents=True)
+    results_tables_dir = Path("results") / "tables" / "cholesky"
+    results_tables_dir.mkdir(exist_ok=True, parents=True)
+
+    timings_tables_dir = Path("timings") / "tables"
+    timings_tables_dir.mkdir(exist_ok=True, parents=True)
 
     # Column labels (baseline + a^2 columns)
     col_labels = ["baseline"] + [f"a^2={a**2:.2g}" for a in a_list]
@@ -172,18 +174,26 @@ def run_simulation_single(
                 "seconds_per_trial": sec / n_trials if n_trials > 0 else np.nan,
             })
 
-    # Save summaries to results/tables
+    # Save summaries to results/tables/cholesky
     idx = p_list
-    pd.DataFrame(mean_normal, index=idx, columns=col_labels).to_csv(tables_dir / "single_normal_mean.csv")
-    pd.DataFrame(std_normal,  index=idx, columns=col_labels).to_csv(tables_dir / "single_normal_std.csv")
-    pd.DataFrame(mean_t,      index=idx, columns=col_labels).to_csv(tables_dir / "single_t_mean.csv")
-    pd.DataFrame(std_t,       index=idx, columns=col_labels).to_csv(tables_dir / "single_t_std.csv")
+    pd.DataFrame(mean_normal, index=idx, columns=col_labels).to_csv(
+        results_tables_dir / "single_normal_mean.csv"
+    )
+    pd.DataFrame(std_normal, index=idx, columns=col_labels).to_csv(
+        results_tables_dir / "single_normal_std.csv"
+    )
+    pd.DataFrame(mean_t, index=idx, columns=col_labels).to_csv(
+        results_tables_dir / "single_t_mean.csv"
+    )
+    pd.DataFrame(std_t, index=idx, columns=col_labels).to_csv(
+        results_tables_dir / "single_t_std.csv"
+    )
 
-    # Save per-step timings (long format)
+    # Save per-step timings (long format) to timings/tables
     timing_df = pd.DataFrame(per_p_rows)
-    timing_df.to_csv(tables_dir / "single_step_timings_cholesky.csv", index=False)
-    print("🕒 Wrote step timings to results/tables/single_step_timings_cholesky.csv")
-    print("✅ Single simulation complete. Saved in results/tables")
+    timing_df.to_csv(timings_tables_dir / "single_step_timings_cholesky.csv", index=False)
+    print("🕒 Wrote step timings to timings/tables/single_step_timings_cholesky.csv")
+    print("✅ Single simulation complete. Saved in results/tables/cholesky")
 
 # ------------------------------------------------------------
 # Multi-spike, multi-reference simulation (Normal + t)
@@ -199,13 +209,15 @@ def run_simulation_multi(
 ) -> None:
     """
     Run the multi-spike / multi-reference simulation under Normal and t sampling,
-    write summary tables (means/stds), and record per-p step timings to
-    results/tables/multi_step_timings.csv.
+    write summary tables (means/stds) to results/tables/cholesky, and record
+    per-p step timings to timings/tables/multi_step_timings_cholesky.csv.
     """
     # --- paths ---
-    base_dir = Path("results")
-    tables_dir = base_dir / "tables"
-    tables_dir.mkdir(exist_ok=True, parents=True)
+    results_tables_dir = Path("results") / "tables" / "cholesky"
+    results_tables_dir.mkdir(exist_ok=True, parents=True)
+
+    timings_tables_dir = Path("timings") / "tables"
+    timings_tables_dir.mkdir(exist_ok=True, parents=True)
 
     col_labels = ["ARG1", "PCA1", "ARG2", "PCA2"]
     mean_normal = np.zeros((len(p_list), len(col_labels)))
@@ -280,18 +292,26 @@ def run_simulation_multi(
                 "seconds_per_trial": sec / n_trials if n_trials > 0 else np.nan,
             })
 
-    # Save summaries to results/tables
+    # Save summaries to results/tables/cholesky
     idx = p_list
-    pd.DataFrame(mean_normal, index=idx, columns=col_labels).to_csv(tables_dir / "multi_normal_mean.csv")
-    pd.DataFrame(std_normal,  index=idx, columns=col_labels).to_csv(tables_dir / "multi_normal_std.csv")
-    pd.DataFrame(mean_t,      index=idx, columns=col_labels).to_csv(tables_dir / "multi_t_mean.csv")
-    pd.DataFrame(std_t,       index=idx, columns=col_labels).to_csv(tables_dir / "multi_t_std.csv")
+    pd.DataFrame(mean_normal, index=idx, columns=col_labels).to_csv(
+        results_tables_dir / "multi_normal_mean.csv"
+    )
+    pd.DataFrame(std_normal, index=idx, columns=col_labels).to_csv(
+        results_tables_dir / "multi_normal_std.csv"
+    )
+    pd.DataFrame(mean_t, index=idx, columns=col_labels).to_csv(
+        results_tables_dir / "multi_t_mean.csv"
+    )
+    pd.DataFrame(std_t, index=idx, columns=col_labels).to_csv(
+        results_tables_dir / "multi_t_std.csv"
+    )
 
-    # Save step timings
+    # Save step timings to timings/tables
     timing_df = pd.DataFrame(per_p_rows)
-    timing_df.to_csv(tables_dir / "multi_step_timings_cholesky.csv", index=False)
-    print("🕒 Wrote step timings to results/tables/multi_step_timings_cholesky.csv")
-    print("✅ Multi simulation complete. Saved in results/tables")
+    timing_df.to_csv(timings_tables_dir / "multi_step_timings_cholesky.csv", index=False)
+    print("🕒 Wrote step timings to timings/tables/multi_step_timings_cholesky.csv")
+    print("✅ Multi simulation complete. Saved in results/tables/cholesky")
 
 # ------------------------------------------------------------
 # Convergence-rate simulation for Theorem 4
@@ -307,12 +327,14 @@ def run_simulation_convergence_rate(
 ) -> None:
     """
     Estimate convergence-rate curves and record per-(snr,p) step timings to
-    results/tables/convergence_step_timings.csv.
+    timings/tables/convergence_step_timings_cholesky.csv.
     """
     # --- paths ---
-    base_dir = Path("results")
-    tables_dir = base_dir / "tables"
-    tables_dir.mkdir(exist_ok=True, parents=True)
+    results_tables_dir = Path("results") / "tables" / "cholesky"
+    results_tables_dir.mkdir(exist_ok=True, parents=True)
+
+    timings_tables_dir = Path("timings") / "tables"
+    timings_tables_dir.mkdir(exist_ok=True, parents=True)
 
     def _snr_tag(snr: float) -> str:
         return f"{snr:g}"
@@ -389,24 +411,25 @@ def run_simulation_convergence_rate(
         baseline = np.where(mean_mat[0, :] == 0.0, 1.0, mean_mat[0, :])
         mean_norm = mean_mat / baseline[None, :]
 
-        # Save normalized table for this SNR
+        # Save normalized table for this SNR to results/tables/cholesky
         col_labels = [f"alpha={a:g}" for a in powers]
         idx = p_list
-        out_csv = tables_dir / f"convergence_rate_snr{_snr_tag(snr)}.csv"
+        out_csv = results_tables_dir / f"convergence_rate_snr{_snr_tag(snr)}.csv"
         pd.DataFrame(mean_norm, index=idx, columns=col_labels).to_csv(out_csv)
 
-    # Save step timings
+    # Save step timings to timings/tables
     timing_df = pd.DataFrame(per_rows)
-    timing_df.to_csv(tables_dir / "convergence_step_timings_cholesky.csv", index=False)
-    print("🕒 Wrote step timings to results/tables/convergence_step_timings_cholesky.csv")
-    print("✅ Convergence-rate simulation complete. Saved in results/tables")
+    timing_df.to_csv(timings_tables_dir / "convergence_step_timings_cholesky.csv", index=False)
+    print("🕒 Wrote step timings to timings/tables/convergence_step_timings_cholesky.csv")
+    print("✅ Convergence-rate simulation complete. Saved in results/tables/cholesky")
 
 # ------------------------------------------------------------------
 # Run simulation
 # ------------------------------------------------------------------
 if __name__ == "__main__":
-    base_dir = Path("results")
-    tables_dir = base_dir / "tables"
+    # Only for total timings: this intentionally uses timings/ as root
+    timings_root = Path("timings")
+    tables_dir = timings_root / "tables"
     tables_dir.mkdir(exist_ok=True, parents=True)
 
     timings = []
@@ -448,12 +471,10 @@ if __name__ == "__main__":
         )
         timings.append(("run_simulation_convergence_rate", time.perf_counter() - t0))
 
-    # --------------------------------------------------------------
-    # Save overall simulation timings to results/tables/timings.csv
-    # --------------------------------------------------------------
+    # Save overall simulation timings to timings/tables/timings_cholesky.csv
     timing_df = pd.DataFrame(timings, columns=["task", "seconds"])
     timing_df["seconds"] = timing_df["seconds"].round(2)
     timing_df.to_csv(tables_dir / "timings_cholesky.csv", index=False)
 
-    print("🕒 Wrote total simulation timings to results/tables/timings_cholesky.csv")
+    print("🕒 Wrote total simulation timings to timings/tables/timings_cholesky.csv")
     print(timing_df)
