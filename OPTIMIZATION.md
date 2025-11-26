@@ -97,7 +97,11 @@ All runtime results are saved under `timings/tables` with relevant figures in `t
  - `(single_normal/single_t/multi_normal/multi_t/convergence)_profiling_(baseline/cholesky/cholesky+parallelization).csv`: aggregated stepwise(data generation, estimator computation, metric computation) profiling results
  - `complexity.csv`: estimated complexity exponents using log-log regression.
 
-## 2.2 
+## 2.2 Computational Complexity Analysis
+
+![Computational Complexity Analysis Figure](timings/figures/complexity_data_generation.svg)
+
+By implementing log-log regression, we estimated the complexity exponents. The results, including the $R^2$ value, are saved in `timings/tables/complexity.csv`. Note that the theoretical complexity is $p^3$ for data generation (both `np.random.multivariate_normal` and Cholesky decomposition) and $p$ for estimator computation and metric computation, which are shown as red line in the figures.
 
 
 Since most of the computational resource was focused on the data generation step, we give plots on the ratio of runtime of data generation to runtime of the other two steps for three simulations. 
