@@ -1,4 +1,4 @@
-# simulation.py
+# simulation_cholesky.py
 # - Single-spike, single-reference (Normal + t)
 # - Multi-spike, multi-reference (Normal + t)
 # - Convergence-rate study for Theorem 4 (Normal)

@@ -1,16 +1,15 @@
-# Simulation Studies for the Adaptive Reference-Guided Estimator
+# Optimization of Simulation for the Adaptive Reference-Guided Estimator
 
-Umich STATS 607 Unit 2 Project, Fall 2025
+Umich STATS 607 Unit 3 Project, Fall 2025
 
-This project reproduces and extends simulation results of [**Yoon and Jung (2025)**](https://onlinelibrary.wiley.com/doi/full/10.1002/sta4.70081).
-It implements three simulation modules:
-1. **Single-spike, single-reference case** (Reproducing tables 1(normal) and 3($t$))  
-2. **Multi-spike, multi-reference** (Reproducing tables 2(normal) and 4($t$))  
-3. **Convergence-rate analysis** for Theorem 4 (Normal distribution only, not in the original paper)
+This project optimizes the simulation of Unit 2 Project, which is based on [**Yoon and Jung (2025)**](https://onlinelibrary.wiley.com/doi/full/10.1002/sta4.70081).
+It implements two optimization strategies:
+1. **Cholesky Decomposition** for generating multivariate normal samples
+2. **Parallelization**
 
-For details, see the paper and `ADEMP.md` (requires MathJax for equation rendering).
+For details, see the paper, `ADEMP.md` and `OPTIMIZATION.md`.
 
-All simulations output summary CSV tables under `results/tables/`, and plots summarizing the results are generated under `results/figures/`.
+The simulation results are saved in `results/`, and runtime results are saved in `timings/`.
 
 ---
 
@@ -33,6 +32,7 @@ All simulations output summary CSV tables under `results/tables/`, and plots sum
    pandas>=2.0
    tqdm>=4.65
    matplotlib>=3.7
+   pytest>=8.0
    ```
    (Python ≥ 3.9 recommended)
 
