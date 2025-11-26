@@ -104,16 +104,19 @@ By implementing log-log regression, complexity exponents with respect to the dim
 ### 2.2.1 Data Generation
 
 ![Computational Complexity Analysis for Data Generation](timings/figures/complexity_data_generation.svg)
+
 The theoretical complexity is $p$, regardless of whether the optimization strategies are applied or not. Since the data generation step consists of several substeps with lower complexity as analyzed in `BASELINE.md`, the overall estimated complexity is lower than the theoretical benchmark, 3.
 
 ### 2.2.2 Estimator Computation
 
 ![Computational Complexity Analysis for Estimator Computation](timings/figures/complexity_estimator_computation.svg)
+
 The theoretical complexity is $p$, regardless of whether the optimization strategies are applied or not. Since the estimator computation step consists of several substeps with lower complexity as analyzed in `BASELINE.md`, the overall estimated complexity is lower than the theoretical benchmark, 1.
 
 ### 2.2.3 Metric Computation
 
 ![Computational Complexity Analysis for Estimator Computation](timings/figures/complexity_metric_computation.svg)
+
 The theoretical complexity is $p$, regardless of whether the optimization strategies are applied or not. Since the metric computation step consists of several substeps with lower complexity as analyzed in `BASELINE.md`, the overall estimated complexity is lower than the theoretical benchmark, 1.
 
 
