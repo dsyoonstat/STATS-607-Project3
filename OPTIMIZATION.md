@@ -99,9 +99,22 @@ All runtime results are saved under `timings/tables` with relevant figures in `t
 
 ## 2.2 Computational Complexity Analysis
 
-![Computational Complexity Analysis Figure](timings/figures/complexity_data_generation.svg)
+By implementing log-log regression, complexity exponents with respect to the dimension $p$ are estimated. The results, including the $R^2$ value, are saved in `timings/tables/complexity.csv`. Note that the theoretical complexity is $p^3$ for data generation (both `np.random.multivariate_normal` and Cholesky decomposition) and $p$ for estimator computation and metric computation, which are shown as red line in the figures.
 
-By implementing log-log regression, we estimated the complexity exponents. The results, including the $R^2$ value, are saved in `timings/tables/complexity.csv`. Note that the theoretical complexity is $p^3$ for data generation (both `np.random.multivariate_normal` and Cholesky decomposition) and $p$ for estimator computation and metric computation, which are shown as red line in the figures.
+### 2.2.1 Data Generation
+
+![Computational Complexity Analysis for Data Generation](timings/figures/complexity_data_generation.svg)
+The theoretical complexity is $p$, regardless of whether the optimization strategies are applied or not. Since the data generation step consists of several substeps with lower complexity as analyzed in `BASELINE.md`, the overall estimated complexity is lower than the theoretical benchmark, 3.
+
+### 2.2.2 Estimator Computation
+
+![Computational Complexity Analysis for Estimator Computation](timings/figures/complexity_estimator_computation.svg)
+The theoretical complexity is $p$, regardless of whether the optimization strategies are applied or not. Since the estimator computation step consists of several substeps with lower complexity as analyzed in `BASELINE.md`, the overall estimated complexity is lower than the theoretical benchmark, 1.
+
+### 2.2.3 Metric Computation
+
+![Computational Complexity Analysis for Estimator Computation](timings/figures/complexity_metric_computation.svg)
+The theoretical complexity is $p$, regardless of whether the optimization strategies are applied or not. Since the metric computation step consists of several substeps with lower complexity as analyzed in `BASELINE.md`, the overall estimated complexity is lower than the theoretical benchmark, 1.
 
 
 Since most of the computational resource was focused on the data generation step, we give plots on the ratio of runtime of data generation to runtime of the other two steps for three simulations. 
