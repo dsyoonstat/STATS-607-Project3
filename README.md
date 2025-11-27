@@ -47,34 +47,43 @@ Run the full pipeline:
 make all
 ```
 
-This will:
-1. Run all simulations (`src/simulation.py`) — saves CSV tables under `results/tables/`
-2. Generate all figures (`src/plot.py`) — saves plots under `results/figures/`
+This command performs the following steps:
+1.	Run all simulations
+(src/simulation_baseline.py, src/simulation_cholesky.py, src/simulation_cholesky+parallelization.py)
+→ Saves result tables under results/tables/ and raw runtime logs under timings/tables/.
+2.	Generate result figures
+(src/plot.py)
+→ Saves plots under results/figures/.
+3.	Aggregate runtime profiling data
+(performance/profiling.py)
+→ Writes profiling tables to timings/tables/.
+4.	Generate profiling figures
+(performance/plot_profiling.py)
+→ Saves plots under timings/figures/.
+5.	Compute log–log complexity estimates
+(performance/complexity.py)
+→ Produces complexity.csv in timings/tables/.
+6.	Generate complexity figures
+(performance/plot_complexity.py)
+→ Saves plots under timings/figures/.
 
 You can also run individual steps:
 ```bash
-make simulate     # Run simulations only
-make figures      # Generate plots only
-make clean        # Remove all generated files
-make test         # Run test suite
+make simulate_baseline                 # Run baseline simulation
+make simulate_cholesky                 # Run Cholesky simulation
+make simulate_cholesky_parallelization # Run Cholesky + parallelization simulation
+
+make result_figures                    # Generate figures from simulation results
+make profiling_figures                 # Generate figures from runtime profiling
+make complexity_figures                # Generate complexity plots
+
+make profile                           # Build aggregated profiling CSVs
+make complexity                        # Compute complexity metrics
+
+make clean                             # Remove all generated outputs
+make test                              # Run test suite
 ```
 
----
-
-## Estimated Runtime
-
-- **Single-spike + Multi-spike + Convergence-rate simulations** (`make simulate`):  
-  < 10 minutes total on a high-end laptop (Apple M4 pro).  
-- Plot generation (`make figures`): < 10 seconds.
-
-You can reduce runtime by lowering `n_trials` or `p_list` values inside `src/simulation.py`.
-
----
-
-## Summary of Key Findings
-
- - The ARG estimator significantly outperformed the naive PCA-based estimator under multivariate normal data, yielding smaller principal angles to the true subspace. The performance gap widened as the reference vector became more aligned with the true principal component subspace. Under the multivariate $t$ distribution, where the assumptions of Yoon and Jung (2025) are not satisfied, the performance gain was smaller but still consistent — the ARG estimator continued to outperform the naive estimator.
- - However, the estimated convergence rates of $|u_1^{\top}d_1|$ varied substantially across different signal-to-noise ratios, and no consistent trend (e.g., increasing $\alpha$ with SNR) was observed. This irregularity appears to stem from the complex behavior of eigenvalues and eigenvectors.
 
 
 ---
