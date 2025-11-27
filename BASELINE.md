@@ -1,10 +1,14 @@
+# 0. Announcement
+
+Note that runtime can vary for each simulation.
+
 # 1. Total Runtime of Entire Simulation Study
 
 | **Task**                        | **Seconds** |
 | ------------------------------- | ----------- |
-| run_simulation_single           | 48.04       |
-| run_simulation_multi            | 46.18       |
-| run_simulation_convergence_rate | 272.47      |
+| run_simulation_single           | 46.35       |
+| run_simulation_multi            | 45.03       |
+| run_simulation_convergence_rate | 261.94      |
 | **Total**                       | **366.69**  |
 
 # 2. Runtime of each simulation
@@ -42,6 +46,7 @@
 | **500**  | 1.14                    | 0.0398                        | 0.00222                    |
 | **1000** | 5.12                    | 0.0499                        | 0.00342                    |
 | **2000** | 37.7                    | 0.0687                        | 0.00407                    |
+
 ##### 2.2.2 Multivariate t Case
 
 | **p**    | **Data generation (s)** | **Estimator computation (s)** | **Metric computation (s)** |
@@ -65,7 +70,7 @@ This simulation only considers multivariate normal case.
 
 # 3. Bottleneck Analysis
 
-It is apparent that the main bottleneck is the data generation for multivariate normal distribution when the dimension $p$ is large. Note that data generation for multivariate t distribution is relatively fast. This is due to the fact that data generation for multivariate normal distribution used `np.random.multivariate_normal`, while that for multivariate t distribution used Cholesky decomposition of covariance matrix $\Sigma$. While doing **Unit 2 Project**, I did not notice that there is a huge difference in speed. Therefore, by adopting Cholesky decomposition to generate multivariate normal data will give a huge boost in speed, although the data generation procedure still remains most time-consuming among data generation, estimator computation and metric computation.
+It is apparent that the main bottleneck is the data generation for multivariate normal distribution when the dimension $p$ is large. Note that data generation for multivariate t distribution is relatively fast. This is due to the fact that data generation for multivariate normal distribution used `np.random.multivariate_normal`, while that for multivariate t distribution used Cholesky decomposition of covariance matrix $\Sigma$. While doing **Unit 2 Project**, I did not notice that there is a huge difference in speed between those two methods. Therefore, by adopting Cholesky decomposition to generate multivariate normal data will give a huge boost in speed, although the data generation procedure still remains most time-consuming among data generation, estimator computation and metric computation, as seen in multivariate t cases.
 
 # 4. Computational Complexity Analysis
 
@@ -128,10 +133,10 @@ RuntimeWarning: divide by zero encountered in matmul
 RuntimeWarning: overflow encountered in matmul
 RuntimeWarning: invalid value encountered in matmul
 ```
-These warnings occurred in **all three steps** of the pipeline—data generation, estimator computation, and metric computation—because certain intermediate BLAS operations briefly reached floating-point limits.
+The log file is saved as `log.txt`. These warnings occurred in **all three steps** of the pipeline—data generation, estimator computation, and metric computation—because certain intermediate BLAS operations briefly reached floating-point limits.
 
 However, all simulated datasets, estimator outputs, and computed metrics contained only valid values (no NaN/Inf). Thus, although numerical warnings were observed, they did not compromise the stability or correctness of the final simulation outcomes.
 
 # 6. Conclusion
 
-To reduce runtime, we focus on reducing the runtime of data generation, as the other steps are relatively fast, especially for large $p$. Therefore, we plan to implement two strategies: (1) Algorithmic improvement on data generation and (2) Parallelization.
+To reduce runtime, we focus on reducing the runtime of data generation, as the other steps are relatively fast, especially for large $p$. Therefore, we plan to implement two strategies: (1) Algorithmic improvement on data generation using Cholesky decomposition and (2) Parallelization.

@@ -2,12 +2,12 @@
 
 | **Task**                        | **Baseline** | **Cholesky** | **Cholesky + Parallelization** |
 | ------------------------------- | ------------ | ------------ | ------------------------------ |
-| run_simulation_single           | 46.99        | 4.22         | 2.77                           |
-| run_simulation_multi            | 47.40        | 3.45         | 2.70                           |
-| run_simulation_convergence_rate | 275.60       | 9.19         | 4.08                           |
-| **Total**                       | **369.99**   | **16.86**    | **9.55**                       |
+| run_simulation_single           | 46.35        | 4.12         | 2.84                           |
+| run_simulation_multi            | 45.03        | 3.43         | 2.69                           |
+| run_simulation_convergence_rate | 261.94       | 9.18         | 4.12                           |
+| **Total**                       | **353.32**   | **16.73**    | **9.65**                       |
 
-Note that runtime changes for each run. Also, this runtime excludes runtime for plotting.
+Note that runtime changes for each run. Please refer to `timings/tables/timings_*.csv` for exact results. Also, this runtime excludes runtime for plotting.
 
 
 # 1. Implemented Optimization Strategies
@@ -58,7 +58,7 @@ def sample_normal_fast(
 
 ### 1.1.4 Performance Impact
 
-The performance gain of implementing Cholesky Decomposition was significant. For `run_simulation_convergence_rate` where only multivariate normal samples were used, the Cholesky-optimized simulation was about **30 times faster** than the original one. For the other two simulations `run_simulation_single` and `run_simulation_multi`, these simulations consists of both generating multivariate normal samples and multivariate t samples with exactly same size and dimension. As Cholesky Decomposition was already implemented in `sample_t`, the performance gain was about 12~14 times.
+The performance gain of implementing Cholesky Decomposition was significant. For `run_simulation_convergence_rate` where only multivariate normal samples were used, the Cholesky-optimized simulation was about **30 times faster** than the original one. For the other two simulations `run_simulation_single` and `run_simulation_multi`, these simulations consists of both generating multivariate normal samples and multivariate t samples with exactly same size and dimension. As Cholesky Decomposition was already implemented in `sample_t`, the performance gain was about 10~15 times.
 
 ### 1.1.5 Trade-Offs
 
@@ -76,16 +76,17 @@ My computer has 14 cores. For the first two simulations `run_simulation_single` 
 
 ### 1.2.3 Code Comparison
 
-Parallelization was implemented. Please refer to `simulation_cholesky+parallelization.py`.
+Parallelization was implemented. Please refer to `src/simulation_cholesky+parallelization.py`.
 
 ### 1.2.4 Performance Impact
 
-The performance gain of implementing parallelization was not that significant as expected. There was a 40% reduction in runtime for the whole simulation pipeline, although the number of cores used were 10, 10, 6.
+The performance gain of implementing parallelization was not that significant as expected. There was a 40% reduction in runtime for the whole simulation pipeline, although the number of cores used were 10, 10, 6. This is due to overhead and the relatively small task sizes per core.
 
 ### 1.2.5 Trade-Offs
 
 In terms of the simulation result itself, there was no trade-off. However, from a computational perspective, increases in memory consumption, coding difficulty and profiling difficulty are clear cons of parallelization.
 
+---
 
 # 2. Runtime Analysis
 
@@ -120,11 +121,11 @@ The theoretical complexity is $p$, regardless of whether the optimization strate
 The theoretical complexity is $p$, regardless of whether the optimization strategies are applied or not. Since the metric computation step consists of several substeps with lower complexity as analyzed in `BASELINE.md`, the overall estimated complexity is lower than the theoretical benchmark, 1.
 
 
+## 2.3 Overall Timing Comparison
+
 Since most of the computational resource was focused on the data generation step, we give plots on the ratio of runtime of data generation to runtime of the other two steps for three simulations. 
 
-
-
-
+---
 
 # 3. Lessons Learned
 
@@ -140,6 +141,8 @@ We confirmed that for simulation studies involving relatively small or moderate 
 
 The performance gains achieved through parallelization were less dramatic than initially anticipated across all simulation settings. Although the number of cores was optimized, the runtime was reduced by only approximately $30\%$ for the first two simulations and $50\%$ for the final simulation. Given the **relatively small number of trials (100 times)**, the **auxiliary time expenditure**—including the launching, managing, and synchronizing parallel processes, along with the overhead from potential repeated tasks and the final result integration—was a limiting factor on overall efficiency.
 
+---
+
 # 4. Consistency of the Result
 
-To verify that the simulation results obtained under the optimization strategies remain consistent with the original implementation, we performed regression-based comparison tests in `tests/test_regression.py`. For each CSV file generated under `results/tables`, all numerical entries were compared with their corresponding baseline values. Consistency was assessed using two criteria: the mean-squared error (MSE) had to remain below 5%, and the maximum relative deviation was allowed up to 25%. If either threshold was exceeded, the test was marked as a failure. All CSV files passed these checks, confirming that the use of Cholesky decomposition and parallelization preserves the statistical correctness of the simulation outputs.
+To verify that the simulation results obtained under the optimization strategies remain consistent with the original implementation, we performed regression-based comparison tests in `tests/test_regression.py`. For each CSV file generated under `results/tables/`, all numerical entries were compared with their corresponding baseline values. Consistency was assessed using two criteria: the mean-squared error (MSE) had to remain below 5%, and the maximum relative deviation was allowed up to 25%. If either threshold was exceeded, the test was marked as a failure. All CSV files passed these checks, confirming that the use of Cholesky decomposition and parallelization preserves the statistical correctness of the simulation outputs.
