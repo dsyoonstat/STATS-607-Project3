@@ -9,64 +9,66 @@ Note that runtime can vary for each simulation.
 | run_simulation_single           | 46.35       |
 | run_simulation_multi            | 45.03       |
 | run_simulation_convergence_rate | 261.94      |
-| **Total**                       | **366.69**  |
+| **Total**                       | **353.32**  |
 
 # 2. Runtime of each simulation
 
-### 2.1 run_simulation_single
+## 2.1 run_simulation_single
 
-##### 2.1.1 Multivariate Normal Case
+### 2.1.1 Multivariate Normal Case
 
-| **p**    | **Data generation (s)** | **Estimator computation (s)** | **Metric computation (s)** |
-| -------- | ----------------------- | ----------------------------- | -------------------------- |
-| **100**  | 0.0563                  | 0.0912                        | 0.00442                    |
-| **200**  | 0.173                   | 0.0909                        | 0.00441                    |
-| **500**  | 1.23                    | 0.102                         | 0.00576                    |
-| **1000** | 5.41                    | 0.114                         | 0.00823                    |
-| **2000** | 38.4                    | 0.127                         | 0.00618                    |
+| **p** | **Data generation (s)** | **Estimator computation (s)** | **Metric computation (s)** |
+| --- | --- | --- | --- |
+| **100** | 0.0564 | 0.0911 | 0.0045 |
+| **200** | 0.1761 | 0.0907 | 0.0043 |
+| **500** | 1.1971 | 0.1023 | 0.0056 |
+| **1000** | 5.4285 | 0.1118 | 0.0080 |
+| **2000** | 36.7652 | 0.1262 | 0.0061 |
 
-##### 2.1.2 Multivariate t Case
+### 2.1.2 Multivariate t Case
 
-| **p**    | **Data generation (s)** | **Estimator computation (s)** | **Metric computation (s)** |
-| -------- | ----------------------- | ----------------------------- | -------------------------- |
-| **100**  | 0.00789                 | 0.0868                        | 0.00438                    |
-| **200**  | 0.0147                  | 0.0897                        | 0.00445                    |
-| **500**  | 0.0676                  | 0.102                         | 0.00570                    |
-| **1000** | 0.247                   | 0.112                         | 0.00666                    |
-| **2000** | 1.24                    | 0.126                         | 0.00615                    |
+| **p** | **Data generation (s)** | **Estimator computation (s)** | **Metric computation (s)** |
+| --- | --- | --- | --- |
+| **100** | 0.0079 | 0.0874 | 0.0044 |
+| **200** | 0.0151 | 0.0897 | 0.0044 |
+| **500** | 0.0638 | 0.1015 | 0.0056 |
+| **1000** | 0.2454 | 0.1108 | 0.0065 |
+| **2000** | 1.2015 | 0.1256 | 0.0061 |
 
-### 2.2 run_simulation_multi
+## 2.2 run_simulation_multi
 
-##### 2.2.1 Multivariate Normal Case
+### 2.2.1 Multivariate Normal Case
 
-| **p**    | **Data generation (s)** | **Estimator computation (s)** | **Metric computation (s)** |
-| -------- | ----------------------- | ----------------------------- | -------------------------- |
-| **100**  | 0.0550                  | 0.0301                        | 0.00167                    |
-| **200**  | 0.173                   | 0.0315                        | 0.00159                    |
-| **500**  | 1.14                    | 0.0398                        | 0.00222                    |
-| **1000** | 5.12                    | 0.0499                        | 0.00342                    |
-| **2000** | 37.7                    | 0.0687                        | 0.00407                    |
+| **p** | **Data generation (s)** | **Estimator computation (s)** | **Metric computation (s)** |
+| --- | --- | --- | --- |
+| **100** | 0.0547 | 0.0297 | 0.0017 |
+| **200** | 0.1720 | 0.0312 | 0.0016 |
+| **500** | 1.1451 | 0.0392 | 0.0021 |
+| **1000** | 5.1310 | 0.0493 | 0.0033 |
+| **2000** | 36.5534 | 0.0639 | 0.0039 |
 
-##### 2.2.2 Multivariate t Case
+### 2.2.2 Multivariate t Case
 
-| **p**    | **Data generation (s)** | **Estimator computation (s)** | **Metric computation (s)** |
-| -------- | ----------------------- | ----------------------------- | -------------------------- |
-| **100**  | 0.00704                 | 0.0286                        | 0.00159                    |
-| **200**  | 0.0150                  | 0.0295                        | 0.00152                    |
-| **500**  | 0.0652                  | 0.0345                        | 0.00164                    |
-| **1000** | 0.248                   | 0.0392                        | 0.00185                    |
-| **2000** | 1.21                    | 0.0525                        | 0.00266                    |
-### 2.3 run_simulation_convergence_rate
+| **p** | **Data generation (s)** | **Estimator computation (s)** | **Metric computation (s)** |
+| --- | --- | --- | --- |
+| **100** | 0.0069 | 0.0276 | 0.0016 |
+| **200** | 0.0150 | 0.0294 | 0.0016 |
+| **500** | 0.0651 | 0.0345 | 0.0017 |
+| **1000** | 0.2478 | 0.0388 | 0.0018 |
+| **2000** | 1.1821 | 0.0501 | 0.0026 |
+
+## 2.3 run_simulation_convergence_rate
 
 This simulation only considers multivariate normal case.
 
-| **p**    | **Data generation (s)** | **Estimator computation (s)** | **Metric computation (s)** |
-| -------- | ----------------------- | ----------------------------- | -------------------------- |
-| **100**  | 0.316                   | 0.0821                        | 0.00193                    |
-| **200**  | 1.00                    | 0.0844                        | 0.00193                    |
-| **500**  | 7.16                    | 0.136                         | 0.00326                    |
-| **1000** | 31.1                    | 0.152                         | 0.00558                    |
-| **2000** | 232                     | 0.199                         | 0.00648                    |
+| **p** | **Data generation (s)** | **Estimator computation (s)** | **Metric computation (s)** |
+| --- | --- | --- | --- |
+| **100** | 0.3122 | 0.0805 | 0.0019 |
+| **200** | 1.0015 | 0.0836 | 0.0019 |
+| **500** | 6.9220 | 0.1177 | 0.0030 |
+| **1000** | 30.5764 | 0.1468 | 0.0054 |
+| **2000** | 222.4254 | 0.1834 | 0.0060 |
+
 
 # 3. Bottleneck Analysis
 
@@ -76,7 +78,7 @@ It is apparent that the main bottleneck is the data generation for multivariate 
 
 Since High-Dimensional Low-Sample Size(HDLSS) asymptotics fix the sample size $n$ and let the dimension $p$ grows to $\infty$, we consider the computational complexity with respect to the $p$. 
 
-### 4.1 Empirical Analysis
+## 4.1 Empirical Analysis
 
 The estimated computational complexity using log-log regression is as follows:
 
@@ -91,9 +93,9 @@ The estimated computational complexity using log-log regression is as follows:
 
 The high $R^2$ values across all three steps strongly suggest that the empirical computational complexity estimates are highly reliable. It's worthy to note that $R^2$ for data generation is remarkably close to 1.0 (averaging 0.9935). This near-perfect fit occurs because the data generation step is dominated by a single, high-complexity operation—$\mathrm{O}(p^3)$ Singular Value Decomposition or Cholesky Decomposition—which serves as a clean, overriding bottleneck.
 
-### 4.2 Theoretical Analysis
+## 4.2 Theoretical Analysis
 
-##### 4.2.1 Data Generation
+### 4.2.1 Data Generation
 
 Since both Singular Value Decomposition used in `np.random.multivariate_normal` and Cholesky Decomposition has same computational complexity of $O(p^3)$, the theoretical computational complexity of data generation step is $O(p^3)$ as analyzed below.
 
@@ -104,7 +106,7 @@ Since both Singular Value Decomposition used in `np.random.multivariate_normal` 
 | **Transformation**                | $\mathrm{O}(p^2)$          |
 | **Overall**                       | $\mathbf{\mathrm{O}(p^3)}$ |
 
-##### 4.2.2 Estimator Computation
+### 4.2.2 Estimator Computation
 
 The theoretical computational complexity of estimator computation step is $O(p)$ thanks to Gram matrix trick which was adopted during **Unit 2 Project** to reduce runtime, as analyzed below.
 
@@ -115,7 +117,7 @@ The theoretical computational complexity of estimator computation step is $O(p)$
 | **Transformation**          | $\mathrm{O}(p)$          |
 | **Overall**                 | $\mathbf{\mathrm{O}(p)}$ |
 
-##### 4.2.3 Metric Computation
+### 4.2.3 Metric Computation
 
 The theoretical computational complexity of metric computation step is $O(p)$ as analyzed below.
 
