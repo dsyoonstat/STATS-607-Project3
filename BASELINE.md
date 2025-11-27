@@ -127,6 +127,10 @@ The theoretical computational complexity of metric computation step is $O(p)$ as
 | **Singular Value Decomposition** | $\mathrm{O}(1)$          |
 | **Overall**                      | $\mathbf{\mathrm{O}(p)}$ |
 
+## 4.3 Comparison between Empirical and Theoretical results
+
+Although the theoretical computational complexities are $O(p^3)$, $O(p)$, and $O(p)$ respectively for data generation, estimator computation, and metric computation, the empirical results were lower. This is due to the fact that each step is composed of multiple sub-tasks with different complexity orders, and the observed runtime reflects a mixture of these costs rather than the dominant asymptotic term alone. Since the overall theoretical complexity is determined by the highest-order sub-task, the asymptotic behavior becomes evident only when p is extremely large. However, with the maximum dimension in our experiments being $p = 2000$, the dominant term does not fully overpower the lower-order components, leading the empirical log–log regressions to produce exponents smaller than their theoretical values.
+
 # 5. Numerical Instability Analysis
 
 During the simulation runs, NumPy generated several numerical warnings such as:

@@ -53,7 +53,7 @@ STEP_COLUMNS = [
 
 
 # ---------------------- helpers ----------------------
-def _fit_log_log(p: np.ndarray, t: np.ndarray) -> (float, float):
+def _fit_log_log(p: np.ndarray, t: np.ndarray) -> tuple[float, float]:
     """
     Fit log-log regression: log(t) = a + alpha * log(p).
 

@@ -115,7 +115,7 @@ def _compute_relative_errors(baseline: np.ndarray, variant: np.ndarray) -> np.nd
     return rel
 
 
-def _mse_and_max_error(baseline: np.ndarray, variant: np.ndarray) -> (float, float):
+def _mse_and_max_error(baseline: np.ndarray, variant: np.ndarray) -> tuple[float, float]:
     """
     Compute:
       - MSE(relative error)
