@@ -1,21 +1,30 @@
 #!/usr/bin/env python3
 # plot_profiling.py
 #
-# Plot runtime profiling breakdowns from aggregated profiling CSVs.
+# Plot runtime profiling breakdowns from aggregated profiling CSVs, and
+# summarize overall speedups across simulation variants.
 #
-# Inputs (per variant):
+# Inputs (per variant for profiling breakdown):
 #   timings/tables/single_normal_profiling_{variant}.csv
 #   timings/tables/single_t_profiling_{variant}.csv
 #   timings/tables/multi_normal_profiling_{variant}.csv
 #   timings/tables/multi_t_profiling_{variant}.csv
 #   timings/tables/convergence_profiling_{variant}.csv
 #
-# Outputs (per variant):
+# Inputs (overall timings for speedup plot):
+#   timings/tables/timings_baseline.csv
+#   timings/tables/timings_cholesky.csv
+#   timings/tables/timings_cholesky+parallelization.csv
+#
+# Outputs (per variant, profiling breakdown):
 #   timings/figures/single_normal_profiling_{variant}.pdf / .svg
 #   timings/figures/single_t_profiling_{variant}.pdf / .svg
 #   timings/figures/multi_normal_profiling_{variant}.pdf / .svg
 #   timings/figures/multi_t_profiling_{variant}.pdf / .svg
 #   timings/figures/convergence_profiling_{variant}.pdf / .svg
+#
+# Output (overall speedup summary):
+#   timings/figures/overall_speedup.pdf / .svg
 
 from pathlib import Path
 import numpy as np
@@ -93,7 +102,40 @@ def _load_runtime_table(stem: str, variant_key: str) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
-# ---------------------- plotting helpers ----------------------
+def _load_overall_timings():
+    """
+    Load overall simulation timings for baseline and optimized variants.
+
+    Expects:
+      timings/tables/timings_baseline.csv
+      timings/tables/timings_cholesky.csv
+      timings/tables/timings_cholesky+parallelization.csv
+
+    Each CSV must have columns:
+      - 'task'
+      - 'seconds'
+    """
+    tables_dir = Path("timings/tables")
+
+    df_base = pd.read_csv(tables_dir / "timings_baseline.csv")
+    df_chol = pd.read_csv(tables_dir / "timings_cholesky.csv")
+    df_par  = pd.read_csv(tables_dir / "timings_cholesky+parallelization.csv")
+
+    # Merge on 'task' to align rows
+    df = (
+        df_base.rename(columns={"seconds": "baseline"})
+        .merge(df_chol.rename(columns={"seconds": "cholesky"}), on="task", how="inner")
+        .merge(
+            df_par.rename(columns={"seconds": "cholesky+parallelization"}),
+            on="task",
+            how="inner",
+        )
+    )
+
+    return df
+
+
+# ---------------------- profiling breakdown plotting ----------------------
 def _plot_three_buckets(df: pd.DataFrame, title: str, stem: str):
     """
     Plot bar chart with three buckets:
@@ -152,17 +194,77 @@ def _plot_variant(variant_key: str, pretty: str):
         _plot_three_buckets(df, full_title, out_stem)
 
 
+# ---------------------- overall speedup plotting ----------------------
+def _pretty_task_label(task: str) -> str:
+    """
+    Turn a raw task name such as 'run_simulation_convergence_rate'
+    into a shorter, more readable label.
+    """
+    if task.startswith("run_simulation_"):
+        core = task[len("run_simulation_"):]
+    else:
+        core = task
+
+    mapping = {
+        "single": "Single",
+        "multi": "Multi",
+        "convergence_rate": "Convergence",
+    }
+    return mapping.get(core, core.replace("_", " ").title())
+
+
+def _plot_overall_speedups():
+    """
+    Plot speedup of Cholesky and Cholesky+parallelization relative to baseline
+    for each high-level task (single / multi / convergence).
+    """
+    df = _load_overall_timings()
+
+    tasks = df["task"].tolist()
+    baseline = df["baseline"].to_numpy(float)
+    chol     = df["cholesky"].to_numpy(float)
+    par      = df["cholesky+parallelization"].to_numpy(float)
+
+    # Speedup = baseline time / optimized time
+    speedup_chol = baseline / chol
+    speedup_par  = baseline / par
+
+    x = np.arange(len(tasks))
+    width = 0.35
+
+    fig, ax = plt.subplots(figsize=(6.4, 4.0))
+
+    ax.bar(x - width / 2, speedup_chol, width, label="Cholesky")
+    ax.bar(x + width / 2, speedup_par,  width, label="Cholesky + Parallelization")
+
+    ax.axhline(1.0, color="gray", linestyle="--", linewidth=1.2, alpha=0.7)
+
+    ax.set_xticks(x)
+    ax.set_xticklabels([_pretty_task_label(t) for t in tasks])
+    ax.set_ylabel("Speedup (×)")
+    ax.set_title("Overall speedup relative to Baseline")
+    ax.legend(frameon=False, ncol=2, loc="upper center")
+
+    _save(fig, "speedup_overall")   # ← 여기 변경됨
+    plt.close(fig)
+
+
 # ---------------------- main ----------------------
 def main():
     _ensure_dirs()
     _set_pub_style()
 
+    # Per-variant profiling breakdowns
     for variant_key, info in VARIANTS.items():
         pretty = info["pretty"]
         print(f"\n=== Plotting profiling figures: {variant_key} ({pretty}) ===")
         _plot_variant(variant_key, pretty)
 
-    print("\nDone generating profiling plots.")
+    # Overall speedup summary
+    print("\n=== Plotting overall speedup summary ===")
+    _plot_overall_speedups()
+
+    print("\nDone generating profiling and speedup plots.")
 
 
 if __name__ == "__main__":

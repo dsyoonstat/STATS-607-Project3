@@ -13,6 +13,15 @@ The simulation results are saved in `results/`, and runtime results are saved in
 
 ---
 
+## Performance Summary of the Optimization Strategies
+
+![speedup_overall.svg](timings/figures/speedup_overall.svg)
+
+Using Cholesky decomposition yields a 10–15× speedup for the single- and multi-spike simulations, and nearly a 30× speedup for the convergence-rate study. The smaller gain in the single and multi simulations is expected: each contains both Normal and Student-t cases, and the Student-t generator already uses a Cholesky-based implementation. Therefore, the true improvement over the naïve np.`random.multivariate_normal` implementation is best reflected in the ~30× speedup observed in the convergence experiment. Parallelization provides an additional ≈2× speedup, which is beneficial but more modest than expected—likely due to overhead and the relatively small task sizes per core.
+
+
+---
+
 ## Setup Instructions
 
 1. **Clone or open the repository**, then create a Python environment:
@@ -84,6 +93,6 @@ make clean                             # Remove all generated outputs
 make test                              # Run test suite
 ```
 
-
-
 ---
+
+
