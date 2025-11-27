@@ -1,6 +1,6 @@
 # 0. Announcement
 
-Note that runtime can vary for each simulation.
+Note that runtime can vary for each simulation. The numbers in this documentation is based on the final experiment before submitting.
 
 # 1. Total Runtime of Entire Simulation Study
 
@@ -82,16 +82,16 @@ Since High-Dimensional Low-Sample Size(HDLSS) asymptotics fix the sample size $n
 
 The estimated computational complexity using log-log regression is as follows:
 
-| **Step**                | **Metric** | **single/normal**       | **single/t**            | **multi/normal**        | **multi/t**             | **convergence**         |
+| **Step** | **Metric** | **single/normal** | **single/t** | **multi/normal** | **multi/t** | **convergence** |
 |------------------------|------------|--------------------------|--------------------------|--------------------------|--------------------------|--------------------------|
-| **Data generation**    | Complexity | $\mathrm{O}(p^{2.92})$   | $\mathrm{O}(p^{2.86})$   | $\mathrm{O}(p^{2.16})$   | $\mathrm{O}(p^{1.72})$   | $\mathrm{O}(p^{2.18})$   |
-|                        | $R^2$      | $0.9996$                 | $0.9997$                 | $0.9911$                 | $0.9850$                 | $0.9920$                 |
-| **Estimator computation** | Complexity | $\mathrm{O}(p^{0.10})$   | $\mathrm{O}(p^{0.12})$   | $\mathrm{O}(p^{0.28})$   | $\mathrm{O}(p^{0.20})$   | $\mathrm{O}(p^{0.31})$   |
-|                        | $R^2$      | $0.6974$                 | $0.7818$                 | $0.9440$                 | $0.9100$                 | $0.9566$                 |
-| **Metric computation** | Complexity | $\mathrm{O}(p^{0.24})$   | $\mathrm{O}(p^{0.17})$   | $\mathrm{O}(p^{0.34})$   | $\mathrm{O}(p^{0.16})$   | $\mathrm{O}(p^{0.46})$   |
-|                        | $R^2$      | $0.8170$                 | $0.8710$                 | $0.9147$                 | $0.7069$                 | $0.9399$                 |
+| **Data generation** | Complexity | $\mathrm{O}(p^{2.15})$   | $\mathrm{O}(p^{1.68})$   | $\mathrm{O}(p^{2.15})$   | $\mathrm{O}(p^{1.72})$   | $\mathrm{O}(p^{2.17})$   |
+|                        | $R^2$      | $0.9928$                 | $0.9799$                 | $0.9919$                 | $0.9862$                 | $0.9923$                 |
+| **Estimator computation** | Complexity | $\mathrm{O}(p^{0.11})$   | $\mathrm{O}(p^{0.12})$   | $\mathrm{O}(p^{0.26})$   | $\mathrm{O}(p^{0.19})$   | $\mathrm{O}(p^{0.29})$   |
+|                        | $R^2$      | $0.9360$                 | $0.9677$                 | $0.9572$                 | $0.9483$                 | $0.9715$                 |
+| **Metric computation** | Complexity | $\mathrm{O}(p^{0.17})$   | $\mathrm{O}(p^{0.14})$   | $\mathrm{O}(p^{0.32})$   | $\mathrm{O}(p^{0.15})$   | $\mathrm{O}(p^{0.44})$   |
+|                        | $R^2$      | $0.6358$                 | $0.8473$                 | $0.9030$                 | $0.7404$                 | $0.9283$                 |
 
-The high $R^2$ values across all three steps strongly suggest that the empirical computational complexity estimates are highly reliable. It's worthy to note that $R^2$ for data generation is remarkably close to 1.0 (averaging 0.9935). This near-perfect fit occurs because the data generation step is dominated by a single, high-complexity operation—$\mathrm{O}(p^3)$ Singular Value Decomposition or Cholesky Decomposition—which serves as a clean, overriding bottleneck.
+The high $R^2$ values across all three steps strongly suggest that the empirical computational complexity estimates are highly reliable. The results can be found in `timings/tables/complexity.csv`.
 
 ## 4.2 Theoretical Analysis
 
